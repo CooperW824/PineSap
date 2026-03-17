@@ -1,1 +1,6 @@
-@import "tailwindcss";  
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes:
+    lemondade --default,
+    forest --prefersdark;
+}
