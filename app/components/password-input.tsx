@@ -2,8 +2,12 @@
 
 export default function PasswordInput({
   onChange,
+  placeholder = "Password",
+  disabled = false,
 }: {
   onChange?: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
 }) {
   return (
     <>
@@ -27,10 +31,12 @@ export default function PasswordInput({
         <input
           type="password"
           required
-          placeholder="Password"
+          placeholder={placeholder}
           minLength={8}
           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
           title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+          disabled={disabled}
+          onChange={(e) => onChange?.(e.target.value)}
         />
       </label>
       <p className="validator-hint hidden">
