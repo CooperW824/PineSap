@@ -5,6 +5,8 @@ import {
   Users,
   DollarSign,
   Settings,
+  PanelLeftClose,
+  ArrowRightFromLine
 } from "lucide-react";
 
 export default function SideBar() {
@@ -20,7 +22,19 @@ export default function SideBar() {
       ></label>
 
       <aside className="flex h-screen flex-col items-start border-r border-base-300 bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
+
+        {/* This is our close sidebar button */}
         <ul className="menu w-full grow pt-8">
+          <li>
+            <label
+              htmlFor="pinesap-drawer"
+              aria-label="close sidebar"
+              className={itemClasses}
+              data-tip="Open sidebar"
+            >
+              <PanelLeftClose className="h-5 w-5" strokeWidth={2} />
+            </label>
+          </li>
           <li>
             <Link
               href="/"
@@ -66,8 +80,20 @@ export default function SideBar() {
           </li>
         </ul>
 
+
+
         <div className="w-full pb-4">
           <ul className="menu w-full">
+            <li>
+              <Link
+              href="/sign-out"
+              className={itemClasses}
+              data-tip="Sign Out"
+              >
+                <ArrowRightFromLine className = "h-5 w-5"/>
+                <span className = "is-drawer-close:hidden">Sign Out</span>
+              </Link>
+            </li>
             <li>
               <Link
                 href="/admin-panel"
