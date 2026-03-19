@@ -21,7 +21,10 @@ export default function SideBar() {
         className="drawer-overlay"
       ></label>
 
-      <aside className="flex h-screen flex-col items-start border-r border-base-300 bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
+      <aside
+        data-theme="forest"
+        className="flex h-screen flex-col items-start border-r border-base-300 bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64"
+      >
 
         {/* This is our close sidebar button */}
         <ul className="menu w-full grow pt-8">

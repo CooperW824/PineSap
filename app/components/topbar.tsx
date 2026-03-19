@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function TopBar() {
   return (
-    <nav className="navbar w-full bg-base-200 bg-border-300">
+    <nav data-theme = "forest" className="navbar w-full bg-base-200 bg-border-300">
 
       {/* Replace w/ img tag or svg for logo*/}
       <div> logo_here </div>
