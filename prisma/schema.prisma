@@ -15,11 +15,7 @@ datasource db {
 // TODO: Add user model among other models described in CRC. I.E when Cooper is done with auth. 
 
 // Notes from Nick:
-// The Items and Requests are related implicitly many-to-many. We may need to make a 
-// entire seperate model to explicitly define this relationship. Otherwise
-// Prisma does not support certain database actions like On, Update, Cascade, etc. 
-// Also I know there's probably ways to automate other aspects within the databse, 
-// but I'm not sure enough in my understanding to attempt implementing these right now. 
+// Changed to explicitly declare a many to many relationship. 
 
 /// A type of item that can be on campus or pending in a request. 
 model Item {
@@ -32,11 +28,13 @@ model Item {
   physicalLocation String? @db.VarChar(40) /// The physical location on campus where an item exists.
   placeOfPurchase String? @db.VarChar(100) /// Where the item will be or was purchased from. 
 
-  quantity Int /// The amount of an item requested or existing. 
   // TODO: Verify if this is a good way of storing price.  
   price Decimal @db.Decimal(20, 2) /// The last known price of an item.
+  stockQuantity Int @default(0) /// The amount of an item in stock. 
 
-  requests Request[] /// The item can be in many different requests. 
+  // TODO: Add in any more fields
+
+  requestItems RequestItem[] /// The item can be in many different requests. 
 }
 
 /// A pending, approved, or temrinated, bundle of items to be purchased. 
@@ -50,14 +48,38 @@ model Request {
   // TODO: Add in a user entity for who approved the request.
 
   // TODO: Verify if this is a good way to keep track of status. 
-  status String /// Can be 'Pending', 'Terminated', or 'Approved'.
+  status RequestStatus @default(PENDING) /// Can be 'Pending', 'Denied', or 'Approved'.
   // We can perhaps have a pending bool field instead. 
 
   // TODO: Verify if we should store this and if there's a way to automate it from items.  
   price Decimal @db.Decimal(20, 2) /// The last known price of an item.
 
-  // TODO: Add in any more fields I'm blanking on. 
+  // TODO: Add in any more fields
 
 
-  items Item[] /// The items contained in the request. 
+  requestItems RequestItem[] /// The items contained in the request. 
+}
+
+/// Statuses of a request. 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+// This essentially means there is one RequestItem for every Item and Request pair made.  
+/// Explicit many to many relationship between items and request. 
+model RequestItem {
+  id Int @id @default(autoincrement())
+
+  request Request @relation(fields: [requestId], references: [id])
+  requestId Int /// The id of the request. 
+
+  item Item @relation(fields: [itemId], references: [id])
+  itemId Int /// The id of the item in the request. 
+
+  quantity Int /// The nummber of items for a request. 
+  price Decimal @db.Decimal(20, 2) /// Price at the time of request creation. 
+
+  @@unique([requestId, itemId]) /// Stops the same item being added twice to the same request. 
 }
