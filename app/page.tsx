@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 // -----------------------------
 // TYPE DEFINITIONS (we can edit this if we need to btw)
@@ -74,6 +75,19 @@ export default function AdminSettingsPage() {
     setShowReviewerModal(false);
   };
 
+  const handleRemoveReviewer = (projectId: number, email: string) => {
+    setClubProjects(prev =>
+      prev.map(project =>
+        project.id === projectId
+          ? {
+              ...project,
+              reviewers: project.reviewers.filter(r => r !== email),
+            }
+          : project
+      )
+    );
+  };
+
   // -----------------------------
   // UI 
   // -----------------------------
@@ -134,12 +148,28 @@ export default function AdminSettingsPage() {
                     </button>
                   </div>
 
-                  <p className="text-sm opacity-70">
-                    Reviewers:{" "}
-                    {project.reviewers.length > 0
-                      ? project.reviewers.join(", ")
-                      : "None"}
-                  </p>
+                  <div className="text-base opacity-70">
+                    <p className="font-medium mb-1">Current Reviewer(s):</p>
+
+                    {project.reviewers.length > 0 ? (
+                      <ul className="space-y-2">
+                        {project.reviewers.map((rev, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <span>{rev}</span>
+
+                            <button
+                              className="btn btn-xs btn-ghost text-error"
+                              onClick={() => handleRemoveReviewer(project.id, rev)}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>None</p>
+                    )}
+                  </div>
 
                 </div>
               </div>
