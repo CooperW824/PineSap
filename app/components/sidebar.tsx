@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   Home,
@@ -11,7 +12,7 @@ import {
 
 export default function SideBar() {
   const itemClasses =
-    "is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:grid-cols-1 is-drawer-close:justify-items-center is-drawer-close:px-0";
+    "flex is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:grid-cols-1 is-drawer-close:justify-center is-drawer-close:px-0 h-8";
 
   return (
     <div className="drawer-side is-drawer-close:overflow-visible">
@@ -35,7 +36,8 @@ export default function SideBar() {
               className={itemClasses}
               data-tip="Open sidebar"
             >
-              <PanelLeftClose className="h-5 w-5" strokeWidth={2} />
+              <PanelLeftClose className="h-5 w-5 is-drawer-close:rotate-180 transition duration-300" strokeWidth={2} />
+              <span className="is-drawer-close:hidden">Close Sidebar</span>
             </label>
           </li>
           <li>
@@ -87,16 +89,6 @@ export default function SideBar() {
 
         <div className="w-full pb-4">
           <ul className="menu w-full">
-            <li>
-              <Link
-              href="/sign-out"
-              className={itemClasses}
-              data-tip="Sign Out"
-              >
-                <ArrowRightFromLine className = "h-5 w-5"/>
-                <span className = "is-drawer-close:hidden">Sign Out</span>
-              </Link>
-            </li>
             <li>
               <Link
                 href="/admin-panel"
