@@ -7,7 +7,6 @@ export default function EmailInput({
 }) {
   return (
     <>
-      {" "}
       <label className="input validator input-neutral my-2">
         <svg
           className="h-[1em] opacity-50"
