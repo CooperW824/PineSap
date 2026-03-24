@@ -1,10 +1,19 @@
-import Image from "next/image";
+import { auth } from "@/lib/server/auth"; // path to your Better Auth server instance
+import { headers } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 w-full">
       <h1 className="text-4xl font-bold mb-4">Welcome to PineSap!</h1>
-      <button className="btn btn-accent">Get Started</button>
+      {session ? (
+        <p className="text-lg">You are logged in as {session.user.name}</p>
+      ) : (
+        <p className="text-lg">You are not logged in.</p>
+      )}
     </div>
   );
 }
