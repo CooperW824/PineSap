@@ -17,6 +17,6 @@ export default async function Home() {
       ) : (
         <p className="text-lg">You are not logged in.</p>
       )}
-    </div>
+    </main>
   );
 }
