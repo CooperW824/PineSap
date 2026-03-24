@@ -42,7 +42,7 @@ export class Item {
      static async create(
         itemId: number,
         itemName: string,
-        itemPrice: string,
+        itemPrice: number,
         itemDescription?: string,
     ): Promise<Item | null> {
         const item = await prisma.item.create({
@@ -107,5 +107,5 @@ export class Item {
 
   // special functions
 
-  
+
 }
