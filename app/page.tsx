@@ -7,7 +7,10 @@ export default async function Home() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 w-full">
+    <main
+      data-theme="forest"
+      className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center bg-base-100 py-2 text-base-content"
+    >
       <h1 className="text-4xl font-bold mb-4">Welcome to PineSap!</h1>
       {session ? (
         <p className="text-lg">You are logged in as {session.user.name}</p>
