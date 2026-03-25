@@ -21,7 +21,7 @@ export default function AdminSettingsPage() {
   // STATE VARIABLES
   // -----------------------------
 
-  const clubName = "Club A";
+  const clubName = "CLUB NAME HERE";
 
   const [clubProjects, setClubProjects] = useState<Project[]>([]);
 
