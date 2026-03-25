@@ -1,10 +1,21 @@
+"use client";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/client/auth-client";
+import { useEffect } from "react";
+
 export default function SignOutPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    authClient.signOut().then(() => {
+      router.refresh(); // re-fetches all server components including navbar
+      router.push("/");
+    });
+  }, []);
+
   return (
-    <main
-      data-theme="forest"
-      className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center bg-base-100 py-2 text-base-content"
-    >
-      <h1 className="mb-4 text-4xl font-bold">Sign Out Page</h1>
-    </main>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 w-full">
+      <h1 className="text-4xl font-bold mb-4">Signing out...</h1>
+    </div>
   );
 }
