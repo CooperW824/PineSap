@@ -3,7 +3,7 @@ import { Command } from "commander";
 import * as readline from "readline";
 
 const client = createAuthClient({
-  baseURL: "http://localhost:3000",
+  baseURL: "http://archlinux:3000",
 });
 
 
@@ -74,7 +74,7 @@ program.action(async (options: BootstrapOptions) => {
       password,
       fetchOptions: {
         headers: {
-          Origin: "http://localhost:3000",
+          Origin: "http://archlinux:3000",
         },
       },
     })
