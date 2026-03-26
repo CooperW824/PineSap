@@ -1,5 +1,7 @@
 // import { ChevronDown, Plus, RotateCcw, Trash2, UserRound } from "lucide-react";
+import Link from "next/link"
 
+// sample requests, delete later
 const sampleRequests = [
   {
     name: "the most important purchase",
@@ -23,33 +25,45 @@ export default function RequestsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Requests</h1>
 
-        <button className="btn btn-primary mt-4">
-          Create Request
-        </button>
+        <Link href="/requests/create">
+          <button className="btn btn-primary">
+            Create Request
+          </button>
+        </Link>
+
       </div>
       <div className="space-y-3">
-        {sampleRequests.map((request) => (
-        <div className="mt-6 space-y-4">
-          <div className="card bg-base-200 shadow p-8">
-            <div className="flex justify-between">
-              
-              {/* LEFT SIDE */}
-              <div>
-                <p className="font-bold">Name: {request.name}</p>
-                <p>Status: {request.status}</p>
-                <p>Requester: {request.Requester}</p>
-              </div>
+        <div className="mt-6 rounded-2xl bg-base-200 p-6">
+          <div className="space-y-4">
+            {sampleRequests.map((request) => (
+              <Link
+                key={request.name}
+                href="/requests/view"
+                className="block"
+              > {/* need to make the link element behave like a block so we can have proper spacing, may not be neccesary
+              when we have non-sample requests.*/}
+                <div className="card bg-base-300 shadow p-8 cursor-pointer hover:shadow-lg">
+                  
+                  <div className="flex justify-between">
+                    
+                    <div>
+                      <p className="font-bold">Name: {request.name}</p>
+                      <p>Status: {request.status}</p>
+                      <p>Requester: {request.Requester}</p>
+                    </div>
 
-              {/* RIGHT SIDE */}
-              <div className="text-right">
-                <p>Items: {request.totalItems}</p>
-                <p>Price: {request.totalPrice} $ </p>
-              </div>
+                    <div className="text-right">
+                      <p>Items: {request.totalItems}</p>
+                      <p>Price: {request.totalPrice}</p>
+                    </div>
 
-            </div>
+                  </div>
+
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
-        ))}
       </div>
     </main>
   )
