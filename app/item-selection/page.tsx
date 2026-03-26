@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ImageIcon } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getInventoryItemById } from "@/lib/server/inventory/items";
 
 const detailCardClassName =

@@ -1,3 +1,10 @@
+/* 
+This file is where we will implement all of the information from the database
+of an item. this file is where app/page.tsx and item-selection/page.tsx both pull their 
+information from. This being here serves to make it easier to refactor for database
+calls later.
+*/
+
 export type InventoryItem = {
   id: string;
   title: string;
@@ -22,7 +29,7 @@ const locations = [
 
 const inventoryItems: InventoryItem[] = Array.from({ length: 25 }, (_, index) => {
   const itemNumber = index + 1;
-  const quantity = (index + 1) * 2; //stupid quantity count for now
+  const quantity = (index + 1) * 2; 
 
   return {
     id: `item-${itemNumber}`,
@@ -34,7 +41,7 @@ const inventoryItems: InventoryItem[] = Array.from({ length: 25 }, (_, index) =>
     location: locations[Math.floor(index / 5)],
     quantity,
     purchasedFrom: "Fill this in later w/ db items",
-    priorCost: `$${(itemNumber * 8.75).toFixed(2)}`, //just stupid price calc for now
+    priorCost: `$${(itemNumber * 8.75).toFixed(2)}`, //just stupid cost calc for now
     priorVendor: "Fill this in later w/ db items",
     requestedBy: "Fill this in later w/ db items",
     approvedBy: "Fill this in later w/ db items",
