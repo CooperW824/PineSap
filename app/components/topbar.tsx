@@ -1,15 +1,33 @@
+"use client";
 import Link from "next/link";
+import { authClient } from "@/lib/client/auth-client";
+import { User } from "better-auth";
+import Image from "next/image";
+import Logo from "../assets/Logo_SVG.svg";
 
 export default function TopBar() {
-  return (
-    <nav data-theme = "forest" className="navbar w-full bg-base-200 bg-border-300">
+  const {data: Session} = authClient.useSession();
+  const user = Session?.user as User | null;
 
-      {/* Replace w/ img tag or svg for logo*/}
-      <div> logo_here </div>
-      <div className="px-4 text-xl font-semibold text-heading">PineSap</div>
-      <ul className="menu menu-horizontal px-1">
-        <li>
-          <Link href="/login" className="border border-white">
+  return (
+    <nav
+      data-theme="forest"
+      className="navbar w-full bg-base-200 bg-border-300"
+    >
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center pl-3">
+          <Logo className="text-white pl-3 w-6 h-6" />
+          <div className="px-4 text-xl font-semibold text-heading">PineSap</div>
+        </div>
+        {user ? (
+          <div className="flex items-center gap-4">
+            <span className="text-lg font-medium">Welcome, {user.name}</span>
+            <Link href="/sign-out" className="border border-white btn">
+              Sign Out
+            </Link>
+          </div>
+        ) : (
+          <Link href="/login" className="border border-white btn">
             <svg
               aria-label="Email icon"
               width="16"
@@ -30,8 +48,8 @@ export default function TopBar() {
             </svg>
             Login with Email
           </Link>
-        </li>
-      </ul>
+        )}
+      </div>
     </nav>
   );
 }
