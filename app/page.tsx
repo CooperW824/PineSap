@@ -1,19 +1,10 @@
 import { Filter, Search } from "lucide-react";
+import { getInventoryItems } from "@/lib/server/inventory/items";
 
 import Pagination from "./components/pagination";
-import { type InventoryItem } from "./components/item-box";
 
 export default function Home() {
-  const mockItems: InventoryItem[] = Array.from({ length: 25 }).map((_, i) => ({
-    id: i,
-    title: `Item ${i + 1}`,
-    description:
-      i % 2 === 0
-        ? "Short description"
-      : "THIS IS A LONG ITEM DESCRIPTION I WANT TO TEST IF IT WILL WORK WITH A LOT OF TEXT SO THAT THE SPACING IS OKAHLAKSNH...askjdhaoksdhkasdhbakjhbdkasjhdkiajhd...",
-    location: `Storage Unit ${Math.floor(i / 5) + 1}`,
-    quantity: `${(i + 1) * 2}`,
-  }));
+  const inventoryItems = getInventoryItems();
 
   return (
     <main className="min-h-screen w-full p-6 bg-base-100 text-base-content flex flex-col items-center">
@@ -55,7 +46,7 @@ export default function Home() {
             </button>
           </div>
 
-          <Pagination items={mockItems} />
+          <Pagination items={inventoryItems} />
         </section>
       </div>
     </main>

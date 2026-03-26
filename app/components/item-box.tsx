@@ -1,18 +1,5 @@
 import Link from "next/link";
-
-
-// All inventory items now have this... We will pull the other information that item-selection screen will need from db i assume? 
-// Since it doesn't need to be displayed on home page
-
-// app/page.tsx passes the array component created for the mockItems, which is created as  inventoryItem array,
-//  then pagination.tsx slices into paginatedItems, maps over the paginated Items, and item-box renders the UI for each item.  
-export type InventoryItem = {
-  id: number;
-  title: string;
-  description: string;
-  location: string;
-  quantity: string;
-};
+import { type InventoryItem } from "@/lib/server/inventory/items";
 
 type ItemBoxProps = {
   item: InventoryItem;
@@ -29,7 +16,7 @@ const truncateText = (text: string, maxLength: number) => {
 export default function ItemBox({ item }: ItemBoxProps) {
   return (
     <Link
-      href="/item-selection"
+      href={`/item-selection?itemId=${item.id}`}
       className="card bg-base-200 shadow w-full hover:bg-base-300 transition-colors cursor-pointer active:scale-[0.99] block"
     >
       <div className="card-body p-5">

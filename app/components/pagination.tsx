@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { type InventoryItem } from "@/lib/server/inventory/items";
 
-import ItemBox, { type InventoryItem } from "./item-box";
+import ItemBox from "./item-box";
 
 type PaginationProps = {
   items: InventoryItem[];
