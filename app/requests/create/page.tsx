@@ -1,4 +1,4 @@
-import { Trash2, Pencil } from "lucide-react"
+import { Trash2, Pencil } from "lucide-react";
 
 // sample items, delete later
 const sampleItems = [
@@ -14,7 +14,7 @@ const sampleItems = [
     price: "15.00",
     quantity: "10",
   },
-]
+];
 
 export default function CreateRequestPage() {
   return (
@@ -22,12 +22,12 @@ export default function CreateRequestPage() {
       <h1 className="text-3xl font-bold">Create Request</h1>
 
       <div className="mt-6 space-y-6">
-
         {/* Select project */}
-        <select className="select select-bordered w-full max-w-xs">
-          <option disabled selected>
-            Select Project
-          </option>
+        <select
+          className="select select-bordered w-full max-w-xs"
+          defaultValue={"Select Project"}
+        >
+          <option disabled>Select Project</option>
           <option>Rocket Test</option>
           <option>Aquararium Build</option>
           <option>Epic Beehive Project</option>
@@ -48,31 +48,22 @@ export default function CreateRequestPage() {
 
         {/* items */}
         <div className="rounded-2xl bg-base-200 p-6 space-y-4">
-
           {/* header */}
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">Items</h2>
 
-            <button className="btn btn-primary btn-sm">
-              Add New Item
-            </button>
+            <button className="btn btn-primary btn-sm">Add New Item</button>
           </div>
 
           {/* sample items list */}
           <div className="space-y-3">
             {sampleItems.map((item) => (
-              <div
-                key={item.name}
-                className="card bg-base-100 shadow p-4"
-              >
+              <div key={item.name} className="card bg-base-100 shadow p-4">
                 <div className="flex justify-between items-center">
-
                   {/* LEFT SIDE */}
                   <div>
                     <p className="font-bold">{item.name}</p>
-                    <p className="text-sm opacity-70">
-                      {item.description}
-                    </p>
+                    <p className="text-sm opacity-70">{item.description}</p>
                     <p>Total Price: {item.price}</p>
                     <p>Quantity: {item.quantity}</p>
                   </div>
@@ -87,20 +78,15 @@ export default function CreateRequestPage() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-
                 </div>
               </div>
             ))}
           </div>
-
         </div>
 
         {/* SUBMIT BUTTON */}
-        <button className="btn btn-primary">
-          Submit Request
-        </button>
-
+        <button className="btn btn-primary">Submit Request</button>
       </div>
     </main>
-  )
+  );
 }
