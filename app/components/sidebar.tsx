@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import {
   Home,
@@ -7,7 +6,7 @@ import {
   DollarSign,
   Settings,
   PanelLeftClose,
-  ArrowRightFromLine
+  ArrowRightFromLine,
 } from "lucide-react";
 
 export default function SideBar() {
@@ -26,7 +25,6 @@ export default function SideBar() {
         data-theme="forest"
         className="flex h-screen flex-col items-start border-r border-base-300 bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64"
       >
-
         {/* This is our close sidebar button */}
         <ul className="menu w-full grow pt-8">
           <li>
@@ -36,27 +34,22 @@ export default function SideBar() {
               className={itemClasses}
               data-tip="Open sidebar"
             >
-              <PanelLeftClose className="h-5 w-5 is-drawer-close:rotate-180 transition duration-300" strokeWidth={2} />
+              <PanelLeftClose
+                className="h-5 w-5 is-drawer-close:rotate-180 transition duration-300"
+                strokeWidth={2}
+              />
               <span className="is-drawer-close:hidden">Close Sidebar</span>
             </label>
           </li>
           <li>
-            <Link
-              href="/"
-              className={itemClasses}
-              data-tip="Home"
-            >
+            <Link href="/" className={itemClasses} data-tip="Home">
               <Home className="h-5 w-5" />
               <span className="is-drawer-close:hidden">Home</span>
             </Link>
           </li>
 
           <li>
-            <Link
-              href="/requests"
-              className={itemClasses}
-              data-tip="Requests"
-            >
+            <Link href="/requests" className={itemClasses} data-tip="Requests">
               <ClipboardList className="h-5 w-5" />
               <span className="is-drawer-close:hidden">Requests</span>
             </Link>
@@ -74,18 +67,12 @@ export default function SideBar() {
           </li>
 
           <li>
-            <Link
-              href="/budget"
-              className={itemClasses}
-              data-tip="Budget"
-            >
+            <Link href="/budget" className={itemClasses} data-tip="Budget">
               <DollarSign className="h-5 w-5" />
               <span className="is-drawer-close:hidden">Budget</span>
             </Link>
           </li>
         </ul>
-
-
 
         <div className="w-full pb-4">
           <ul className="menu w-full">
@@ -93,10 +80,10 @@ export default function SideBar() {
               <Link
                 href="/admin-panel"
                 className={itemClasses}
-                data-tip="Admin Panel"
+                data-tip="Admin Settings"
               >
                 <Settings className="h-5 w-5" />
-                <span className="is-drawer-close:hidden">Admin Panel</span>
+                <span className="is-drawer-close:hidden">Admin Settings</span>
               </Link>
             </li>
           </ul>
