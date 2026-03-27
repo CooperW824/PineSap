@@ -3,9 +3,8 @@ import { Command } from "commander";
 import * as readline from "readline";
 
 const client = createAuthClient({
-  baseURL: "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 });
-
 
 // General-purpose prompt function
 function prompt(question: string): Promise<string> {
@@ -74,7 +73,7 @@ program.action(async (options: BootstrapOptions) => {
       password,
       fetchOptions: {
         headers: {
-          Origin: "http://localhost:3000",
+          Origin: process.env.BETTER_AUTH_URL || "http://localhost:3000",
         },
       },
     })
