@@ -6,7 +6,7 @@ import Image from "next/image";
 import Logo from "../assets/Logo_SVG.svg";
 
 export default function TopBar() {
-  const {data: Session} = authClient.useSession();
+  const { data: Session } = authClient.useSession();
   const user = Session?.user as User | null;
 
   return (
@@ -16,7 +16,14 @@ export default function TopBar() {
     >
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center pl-3">
-          <Logo className="text-white pl-3 w-6 h-6" />
+          <Image
+            src={Logo}
+            alt="PineSap Logo"
+            width={16}
+            height={16}
+            className="mr-2"
+            color="white"
+          />
           <div className="px-4 text-xl font-semibold text-heading">PineSap</div>
         </div>
         {user ? (
