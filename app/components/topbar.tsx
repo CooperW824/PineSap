@@ -3,7 +3,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/client/auth-client";
 import { User } from "better-auth";
 import Image from "next/image";
-import Logo from "../assets/Logo_SVG.svg";
+import Logo from "../assets/Logo_SVG_White_2.svg";
 
 export default function TopBar() {
   const { data: Session } = authClient.useSession();
@@ -24,7 +24,7 @@ export default function TopBar() {
             className="mr-2"
             color="white"
           />
-          <div className="px-4 text-xl font-semibold text-heading">PineSap</div>
+          <div className="px-1 text-xl font-semibold text-heading">PineSap</div>
         </div>
         {user ? (
           <div className="flex items-center gap-4">
