@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "../../generated/prisma/client"; // relative path — no @/ alias
 import { PrismaPg } from "@prisma/adapter-pg";
 import { EmailSender, GmailEmailSender } from "./email-sender";
+import { admin } from "better-auth/plugins";
 
 const authEmailSender: EmailSender = new GmailEmailSender();
 
@@ -30,4 +31,10 @@ export const auth = betterAuth({
       );
     },
   },
+  user: {
+    deleteUser: {
+      enabled: true, // Allow administrators to delete users through the API.
+    },
+  },
+  plugins: [admin()],
 });

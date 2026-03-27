@@ -1,33 +1,51 @@
-model user {
+model User {
     id            String    @id
     name          String
-    email         String    @unique
-    emailVerified Boolean
+    email         String
+    emailVerified Boolean   @default(false)
     image         String?
-    createdAt     DateTime
-    updatedAt     DateTime
-    sessions      session[]
-    accounts      account[]
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    role          Role      @default(external)
+    banned        Boolean?  @default(false)
+    banReason     String?
+    banExpires    DateTime?
+    sessions      Session[]
+    accounts      Account[]
+
+    @@unique([email])
+    @@map("user")
 }
 
-model session {
-    id        String   @id
-    expiresAt DateTime
-    token     String   @unique
-    createdAt DateTime
-    updatedAt DateTime
-    ipAddress String?
-    userAgent String?
-    userId    String
-    user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum Role {
+    external
+    member
+    admin
 }
 
-model account {
+model Session {
+    id             String   @id
+    expiresAt      DateTime
+    token          String
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    ipAddress      String?
+    userAgent      String?
+    userId         String
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    impersonatedBy String?
+
+    @@unique([token])
+    @@index([userId])
+    @@map("session")
+}
+
+model Account {
     id                    String    @id
     accountId             String
     providerId            String
     userId                String
-    user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     accessToken           String?
     refreshToken          String?
     idToken               String?
@@ -35,15 +53,21 @@ model account {
     refreshTokenExpiresAt DateTime?
     scope                 String?
     password              String?
-    createdAt             DateTime
-    updatedAt             DateTime
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+
+    @@index([userId])
+    @@map("account")
 }
 
-model verification {
-    id         String    @id
+model Verification {
+    id         String   @id
     identifier String
     value      String
     expiresAt  DateTime
-    createdAt  DateTime?
-    updatedAt  DateTime?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@index([identifier])
+    @@map("verification")
 }
