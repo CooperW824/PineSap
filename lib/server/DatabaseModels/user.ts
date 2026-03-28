@@ -37,24 +37,28 @@ export class PersistedUser extends DatabaseObject implements User {
   private m_email: string;
   private m_role: Role;
 
-  constructor(id: string) {
-    super(id);
+  protected constructor(data: UserData) {
+    super(data.id);
     // Fetch the user from the database using the id, and populate the fields of the object.
     // Throw an error if the user is not found.
 
     // Initialize fields to default values while the database query is in progress.
-    this.m_name = "";
-    this.m_email = "";
-    this.m_role = "external";
+    this.m_name = data.name;
+    this.m_email = data.email;
+    this.m_role = data.role;
+  }
 
-    prisma.user.findUnique({ where: { id } }).then((user) => {
-      if (!user) {
-        throw new Error("User not found");
-      }
-      this.m_name = user.name;
-      this.m_email = user.email;
-      this.m_role = user.role as Role;
+  static async getById(id: string): Promise<PersistedUser> {
+    const userData = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, name: true, email: true, role: true },
     });
+
+    if (!userData) {
+      throw new Error("User not found");
+    }
+
+    return new PersistedUser(userData);
   }
 
   static async create(data: {
@@ -90,7 +94,12 @@ export class PersistedUser extends DatabaseObject implements User {
       });
     }
 
-    return new PersistedUser(resp.user.id);
+    return new PersistedUser({
+      email: resp.user.email,
+      id: resp.user.id,
+      name: data.name,
+      role: data.role || "external",
+    });
   }
 
   async delete(): Promise<void> {

@@ -1,7 +1,24 @@
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import UserManagementPane from "@/app/components/user-management/user-management-pane";
+import { headers } from "next/headers";
+import { auth } from "@/lib/server/auth";
+import { redirect } from "next/navigation";
 
 export default async function UserManagementPage() {
+  // Get current session and user from the auth module. If there is no session or the user
+  // does not have permission to view the user management page, we should redirect them to the 404 page.
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/not-found");
+  }
+
+  const user = await PersistedUser.getById(session.user.id);
+
+  if (!user || user.role !== "admin") {
+    redirect("/not-found");
+  }
+
   const count = await PersistedUser.count();
 
   // Only listing the first 10 users when the page loads.
