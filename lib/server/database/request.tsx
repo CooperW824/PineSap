@@ -1,74 +1,121 @@
-import { request } from "node:http"
 import { prisma } from "../prisma"
-
-// may need this
-//import { RequestStatus } from "@prisma/client"
-//status: RequestStatus
+import { Item } from "./Item" // assuming same folder
 
 export class Request {
-    // Local variables
+  id: number
+  name: string
+  status: string
+
+  /// PRIVATE constructor
+  private constructor(data: {
     id: number
     name: string
     status: string
+  }) {
+    this.id = data.id
+    this.name = data.name
+    this.status = data.status
+  }
 
+  /// Fetch from DB by ID
+  static async fromId(requestId: number): Promise<Request | null> {
+    const request = await prisma.request.findUnique({
+      where: { id: requestId },
+    })
 
-    /// Cosntructor
-    constructor(data: {
-        id: number
-        name: string
-        status: string
-    }) {
-        this.id= data.id
-        this.name= data.name
-        this.status = data.status
-    }
+    if (!request) return null
 
-    //fetch from DB 
-    static async fetchByID(requestId: number): Promise<Request | null> {
-        const request = await prisma.request.findUnique({
-            where: {id: requestId},
-        })
+    return new Request({
+      id: request.id,
+      name: request.name,
+      status: request.status,
+    })
+  }
 
-        if (!request) return null
+  /// Create EMPTY request
+  static async create(): Promise<Request> {
+    const request = await prisma.request.create({
+      data: {
+        name: "",              // placeholder
+        status: "PENDING",     // default
+      },
+    })
 
-        return new Request({
-            id: request.id,
-            name: request.name,
-            status: request.status 
-        })
-    }
+    return new Request({
+      id: request.id,
+      name: request.name,
+      status: request.status,
+    })
+  }
 
-    //create request in DB
-    /// create request in DB function
-     static async create(
-        requestId: number,
-        requestName: string,
-        requestStatus: string,
-    ): Promise<Request | null> {
-        const request = await prisma.request.create({
-            data: {
-                requestName,
-                requestStatus,
-            },
-        })
-        return new request({
-            id: request.requestId,
-            name: request.requestName,
-            satus: request.requestDescription,
-        })
+  /// Get all items in this request
+  async getItems(): Promise<Item[]> {
+    const requestItems = await prisma.requestItem.findMany({
+      where: { requestId: this.id },
+      include: {
+        item: true,
+      },
+    })
 
-    }
+    return requestItems.map((ri: typeof requestItems[number]) =>
+      new Item({
+        id: ri.item.id,
+        name: ri.item.name,
+        price: Number(ri.item.price),
+        description: ri.item.description ?? undefined,
+      })
+    )
+  }
 
-    //constructor(requestId: string) {{
-    // Fetch request attrs. from the database
-    //}
+  // should this instead take in an item object and quantity? 
+  /// Add item to request
+  async addItem(itemId: number, quantity: number, price: number): Promise<void> {
+    await prisma.requestItem.create({
+      data: {
+        requestId: this.id,
+        itemId,
+        quantity,
+        price,
+      },
+    })
+  }
 
-    //static request create(name: string, price: number, link: string ...){
-    // Create the request in the database and return the object
-    //}
+  // GETTERS
+  getId(): number {
+    return this.id
+  }
 
-// Getter methods can use the local values stored in the object
+  getName(): string {
+    return this.name
+  }
 
-// Setter methods should update the database and the local object attributes
+  getStatus(): string {
+    return this.status
+  }
 
+  // SETTERS
+  async setName(newName: string): Promise<void> {
+    await prisma.request.update({
+      where: { id: this.id },
+      data: { name: newName },
+    })
+    this.name = newName
+  }
+
+  async setStatus(newStatus: string): Promise<void> {
+    await prisma.request.update({
+      where: { id: this.id },
+      data: { status: newStatus },
+    })
+    this.status = newStatus
+  }
+
+  // other methods
+  async approve(): Promise<void> {
+    await this.setStatus("APPROVED")
+  }
+
+  async deny(): Promise<void> {
+    await this.setStatus("DENIED")
+  }
 }
