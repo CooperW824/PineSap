@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import PasswordInput from "../components/password-input";
 import { authClient } from "@/lib/client/auth-client";
+import { redirect } from "next/navigation";
 
 export default function ResetPasswordPage() {
   const [error, setError] = useState<string | undefined>(undefined);
@@ -39,6 +40,8 @@ export default function ResetPasswordPage() {
     if (error) {
       setError(error.message);
     }
+
+    redirect("/login");
   };
 
   return (

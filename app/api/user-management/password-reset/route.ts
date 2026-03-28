@@ -40,7 +40,7 @@ export async function PATCH(request: Request) {
   await auth.api.requestPasswordReset({
     body: {
       email: user.email,
-      redirectTo: `${process.env.BETTER_AUTH_URL}/reset-password`, // The URL the user will be sent to after they reset their password. This should be a page in your frontend that handles the password reset flow.
+      redirectTo: `${process.env.BETTER_AUTH_URL}/reset-password`, 
     },
   });
 

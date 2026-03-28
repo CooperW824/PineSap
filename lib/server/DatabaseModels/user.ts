@@ -80,7 +80,7 @@ export class PersistedUser extends DatabaseObject implements User {
     role?: Role;
   }): Promise<PersistedUser> {
     // Creates a new user in the database using BetterAuth
-    const resp = await auth.api.signUpEmail({
+    const resp = await auth.api.createUser({
       body: {
         name: data.name,
         email: data.email,
@@ -91,7 +91,7 @@ export class PersistedUser extends DatabaseObject implements User {
     const resetResp = await auth.api.requestPasswordReset({
       body: {
         email: data.email,
-        redirectTo: `${process.env.BETTER_AUTH_URL}/reset-password`, // The URL the user will be sent to after they reset their password. This should be a page in your frontend that handles the password reset flow.
+        redirectTo: `${process.env.BETTER_AUTH_URL}/reset-password`,
       },
     });
 

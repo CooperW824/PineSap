@@ -36,5 +36,8 @@ export const auth = betterAuth({
       enabled: true, // Allow administrators to delete users through the API.
     },
   },
-  plugins: [admin()],
+  plugins: [admin({
+    defaultRole: "external", 
+    adminRoles: ["admin"], // Only users with the "admin" role will have access to the admin panel and its features.
+  })], // Adding the admin plugin to manage user roles and permissions.
 });

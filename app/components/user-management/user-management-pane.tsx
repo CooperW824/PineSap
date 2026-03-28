@@ -5,6 +5,8 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import UserCard from "./user-card";
 import PaginationControls from "../pagination-controls";
+import Modal from "../Modal";
+import { set } from "better-auth";
 
 export default function UserManagementPane({
   users,
@@ -17,6 +19,41 @@ export default function UserManagementPane({
   const [reactiveCount, setReactiveCount] = useState<number>(count);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const [addUserModalOpen, setAddUserModalOpen] = useState(false);
+  const [newUserName, setNewUserName] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [userCreationError, setUserCreationError] = useState<string | null>(
+    null,
+  );
+
+  const handleCreateUser = async () => {
+    if (!newUserName || !newUserEmail) return;
+
+    const response = await fetch("/api/user-management/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: newUserName,
+        email: newUserEmail,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setReactiveUsers((users) => [data.user, ...users]);
+      setReactiveCount((count) => count + 1);
+      setAddUserModalOpen(false);
+      setNewUserName("");
+      setNewUserEmail("");
+      setUserCreationError(null);
+    } else {
+      setUserCreationError("Failed to create user. Please try again.");
+      console.error("Failed to create user:", await response.text());
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 lg:items-start lg:justify-between">
       <h1 className="text-3xl font-bold sm:text-4xl">User Management</h1>
@@ -25,10 +62,62 @@ export default function UserManagementPane({
         <button
           type="button"
           className="btn btn-neutral h-14 min-h-14 rounded-2xl px-8 text-lg font-semibold shadow-none"
+          onClick={() => setAddUserModalOpen(true)}
         >
           <Plus className="h-5 w-5" />
           Add User
         </button>
+
+        <Modal
+          title="Add New User"
+          open={addUserModalOpen}
+          onClose={() => {
+            setAddUserModalOpen(false);
+          }}
+          actions={
+            <button
+              type="button"
+              className="btn btn-primary h-10 min-h-10 rounded-full px-6 text-sm font-medium shadow-none"
+              onClick={handleCreateUser}
+            >
+              Create User
+            </button>
+          }
+        >
+          <div className="flex flex-col gap-1 mb-1">
+            <label htmlFor="name" className="text-sm font-medium">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              className="input input-bordered w-full bg-base-200"
+              placeholder="Enter user's name"
+              value={newUserName}
+              onChange={(e) => setNewUserName(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="text-sm font-medium">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={newUserEmail}
+              onChange={(e) => setNewUserEmail(e.target.value)}
+              className="input input-bordered w-full bg-base-200"
+              placeholder="Enter user's email"
+            />
+          </div>
+
+          <div className="mb-4">
+            {userCreationError && (
+              <p className="text-sm text-red-500 mb-2">{userCreationError}</p>
+            )}
+          </div>
+        </Modal>
 
         <div className="rounded-2xl border border-base-300 bg-base-200/60 p-4 sm:p-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
