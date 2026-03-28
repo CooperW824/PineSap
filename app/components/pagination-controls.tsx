@@ -1,5 +1,6 @@
 "use client";
 
+import { set } from "better-auth";
 import { useState } from "react";
 
 export default function PaginationControls({
@@ -29,7 +30,10 @@ export default function PaginationControls({
     <div className="join">
       <button
         className="btn btn-sm btn-neutral disabled:text-base-100 enabled:text-white join-item"
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => {
+          onPageChange(currentPage - 1);
+          setInputValue((prev) => (Number(prev) - 1).toString());
+        }}
         disabled={currentPage === 1}
       >
         &lt;&lt;
@@ -45,7 +49,10 @@ export default function PaginationControls({
       </div>
       <button
         className="btn btn-sm btn-neutral disabled:text-base-100 enabled:text-white join-item"
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => {
+          onPageChange(currentPage + 1);
+          setInputValue((prev) => (Number(prev) + 1).toString());
+        }}
         disabled={currentPage === totalPages}
       >
         &gt;&gt;

@@ -143,7 +143,7 @@ export class PersistedUser extends DatabaseObject implements User {
     const resp = await prisma.user.findMany({
       select: { id: true, name: true, email: true, role: true },
       take: page_size,
-      skip: page_number * page_size,
+      skip: (page_number - 1) * page_size,
       orderBy: { createdAt: "desc" },
     });
     return resp;

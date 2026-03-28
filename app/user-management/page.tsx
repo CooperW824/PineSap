@@ -25,7 +25,7 @@ export default async function UserManagementPage() {
   // The user management pane will have pagination controls to load more users if needed.
   const users = await PersistedUser.list(
     Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
-    0,
+    1,
   );
   return (
     <main

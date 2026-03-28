@@ -53,6 +53,7 @@ export default function UserManagementPane({
       setNewUserName("");
       setNewUserEmail("");
       setUserCreationError(null);
+      setCreateUserLoading(false);
     } else {
       setUserCreationError("Failed to create user. Please try again.");
       console.error("Failed to create user:", await response.text());
@@ -115,6 +116,22 @@ export default function UserManagementPane({
         ),
       );
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    // Fetch the users for the new page from the server
+    fetch(
+      `/api/user-management?page=${newPage}&limit=${process.env.NEXT_PUBLIC_ITEMS_PER_PAGE}`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setReactiveUsers(data.users);
+        setReactiveCount(data.count);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch users for page " + newPage, err);
+      });
   };
 
   return (
@@ -217,7 +234,7 @@ export default function UserManagementPane({
           reactiveCount / Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
         )}
         currentPage={currentPage}
-        onPageChange={setCurrentPage}
+        onPageChange={handlePageChange}
       />
     </div>
   );
