@@ -77,15 +77,15 @@ export async function DELETE(request: Request) {
     });
   }
 
-  const { id } = await request.json();
+  const { id: userId } = await request.json();
 
-  if (!id) {
+  if (!userId) {
     return new Response(JSON.stringify({ error: "User ID is required" }), {
       status: 400,
     });
   }
 
-  const userToDelete = await PersistedUser.getById(id);
+  const userToDelete = await PersistedUser.getById(userId);
 
   if (!userToDelete) {
     return new Response(JSON.stringify({ error: "User not found" }), {
@@ -102,5 +102,3 @@ export async function DELETE(request: Request) {
     },
   );
 }
-
-

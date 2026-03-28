@@ -61,14 +61,33 @@ export default function UserManagementPane({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: userId }),
+      body: JSON.stringify({ userId }),
     });
 
     if (!response.ok) {
       setUserUpdateError("Failed to delete user. Please try again.");
     } else {
+      setUserUpdateError(null);
       setReactiveUsers((users) => users.filter((user) => user.id !== userId));
       setReactiveCount((count) => count - 1);
+    }
+  };
+
+  const resetUserPassword = async (userId: string) => {
+    const response = await fetch("/api/user-management/password-reset", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      setUserUpdateError(
+        "Failed to send password reset email. Please try again.",
+      );
+    } else {
+      setUserUpdateError(null);
     }
   };
 
@@ -153,7 +172,7 @@ export default function UserManagementPane({
 
       <div className="space-y-3 w-full">
         {reactiveUsers.map((user) => (
-          <UserCard key={user.id} user={user} onDelete={handleDeleteUser} />
+          <UserCard key={user.id} user={user} onDelete={handleDeleteUser} onResetPassword={resetUserPassword} />
         ))}
       </div>
 

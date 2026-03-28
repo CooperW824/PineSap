@@ -6,9 +6,11 @@ import { UserData } from "@/lib/server/DatabaseModels/user";
 export default function UserCard({
   user,
   onDelete,
+  onResetPassword,
 }: {
   user: UserData;
   onDelete: (userId: string) => void;
+  onResetPassword: (userId: string) => void;
 }) {
   return (
     <article
@@ -37,6 +39,7 @@ export default function UserCard({
       <button
         type="button"
         className="btn h-14 min-h-14 rounded-2xl border-base-300 bg-base-200 text-base font-semibold text-base-content shadow-none hover:border-warning/30 hover:bg-warning/10"
+        onClick={() => onResetPassword(user.id)}
       >
         <RotateCcw className="h-4 w-4" />
         Reset User Password
