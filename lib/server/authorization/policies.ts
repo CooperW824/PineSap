@@ -25,10 +25,7 @@ export class RequestPolicy {
   }
 
   canDelete(requestOwner: User): boolean {
-    return (
-      hasAccess(this.user, "admin") ||
-      requestOwner.id === this.user.id
-    );
+    return hasAccess(this.user, "admin") || requestOwner.id === this.user.id;
   }
 }
 
@@ -40,7 +37,7 @@ export class UserManagementPolicy {
   }
 
   canView(): boolean {
-    return hasAccess(this.user, "member");
+    return hasAccess(this.user, "admin");
   }
 
   canChangeRole(): boolean {

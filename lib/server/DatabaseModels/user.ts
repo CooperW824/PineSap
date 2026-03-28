@@ -13,6 +13,13 @@ export interface User {
   set role(role: Role);
 }
 
+export type UserData = {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+};
+
 function randomPassword(length: number): string {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
@@ -95,33 +102,51 @@ export class PersistedUser extends DatabaseObject implements User {
     return Promise.resolve();
   }
 
-	get name(): string {
-		return this.m_name;
-	}
+  static async count(): Promise<number> {
+    const resp = await prisma.user.count();
+    return resp;
+  }
 
-	set name(name: string) {
-		this.m_name = name;
-		prisma.user.update({ where: { id: this.id }, data: { name } });
-	}
+  static async list(
+    page_size: number,
+    page_number: number,
+  ): Promise<UserData[]> {
+    // Return a paginated list of objects from the database.
+    const resp = await prisma.user.findMany({
+      select: { id: true, name: true, email: true, role: true },
+      take: page_size,
+      skip: page_number * page_size,
+      orderBy: { createdAt: "desc" },
+    });
+    return resp;
+  }
 
-	get email(): string {
-		return this.m_email;
-	}
+  get name(): string {
+    return this.m_name;
+  }
 
-	set email(email: string) {
-		this.m_email = email;
-		prisma.user.update({ where: { id: this.id }, data: { email } });
-	}
-	
-	get role(): Role {
-		return this.m_role;
-	}
-	
-	set role(role: Role) {
-		this.m_role = role;
-		prisma.user.update({ where: { id: this.id }, data: { role } });
-	}
+  set name(name: string) {
+    this.m_name = name;
+    prisma.user.update({ where: { id: this.id }, data: { name } });
+  }
 
+  get email(): string {
+    return this.m_email;
+  }
+
+  set email(email: string) {
+    this.m_email = email;
+    prisma.user.update({ where: { id: this.id }, data: { email } });
+  }
+
+  get role(): Role {
+    return this.m_role;
+  }
+
+  set role(role: Role) {
+    this.m_role = role;
+    prisma.user.update({ where: { id: this.id }, data: { role } });
+  }
 }
 
 // A mock user implementation for testing purposes. This would not persist to the database, and would just be used for testing the authorization logic.
@@ -138,33 +163,31 @@ export class MockUser implements User {
     this.m_role = role;
   }
 
- 
-	get id(): string {
-		return this.m_id;
-	}
-	
-	get name(): string {
-		return this.m_name;
-	}
+  get id(): string {
+    return this.m_id;
+  }
 
-	get email(): string {
-		return this.m_email;
-	}
+  get name(): string {
+    return this.m_name;
+  }
 
-	get role(): Role {
-		return this.m_role;
-	}
+  get email(): string {
+    return this.m_email;
+  }
 
-	set name(name: string) {
-		this.m_name = name;
-	}
+  get role(): Role {
+    return this.m_role;
+  }
 
-	set email(email: string) {
-		this.m_email = email;
-	}
-	
-	set role(role: Role) {
-		this.m_role = role;
-	}
+  set name(name: string) {
+    this.m_name = name;
+  }
 
+  set email(email: string) {
+    this.m_email = email;
+  }
+
+  set role(role: Role) {
+    this.m_role = role;
+  }
 }

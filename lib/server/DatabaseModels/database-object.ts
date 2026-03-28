@@ -18,6 +18,17 @@ export class DatabaseObject {
     return new Promise((resolve) => resolve());
   }
 
+  static async count(): Promise<number> {
+    // Return the total number of objects in the database.
+    return 0;
+  }
+
+  static async list(page_size: number, page_number: number): Promise<Object[]> {
+    // Return a paginated list of simple objects only containing the attributes of the object and none of the functionality
+    // of updating the object.
+    return [];
+  }
+
   get id(): string {
     return this.object_id;
   }
