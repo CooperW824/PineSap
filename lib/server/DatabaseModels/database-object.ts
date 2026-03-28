@@ -8,7 +8,7 @@ export class DatabaseObject {
     this.object_id = id;
   }
 
-  static async getById(id: string): Promise<DatabaseObject> {
+  static async getById(id: string): Promise<DatabaseObject | null> {
     // Fetch the object from the database using the id, and return an instance of the object.
     return new Promise((resolve) => resolve(new DatabaseObject(id)));
   }
@@ -36,5 +36,10 @@ export class DatabaseObject {
 
   get id(): string {
     return this.object_id;
+  }
+
+  async save(): Promise<void> {
+    // Save the current state of the object to the database.
+    return new Promise((resolve) => resolve());
   }
 }

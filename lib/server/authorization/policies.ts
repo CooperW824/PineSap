@@ -44,6 +44,10 @@ export class UserManagementPolicy {
     return hasAccess(this.user, "admin");
   }
 
+  canResetPassword(): boolean {
+    return hasAccess(this.user, "admin");
+  }
+
   canDelete(): boolean {
     return hasAccess(this.user, "admin");
   }

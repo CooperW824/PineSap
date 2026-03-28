@@ -48,14 +48,27 @@ export class PersistedUser extends DatabaseObject implements User {
     this.m_role = data.role;
   }
 
-  static async getById(id: string): Promise<PersistedUser> {
+  static async getById(id: string): Promise<PersistedUser | null> {
     const userData = await prisma.user.findUnique({
       where: { id },
       select: { id: true, name: true, email: true, role: true },
     });
 
     if (!userData) {
-      throw new Error("User not found");
+      return null;
+    }
+
+    return new PersistedUser(userData);
+  }
+
+  static async getByEmail(email: string): Promise<PersistedUser | null> {
+    const userData = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, name: true, email: true, role: true },
+    });
+
+    if (!userData) {
+      return null;
     }
 
     return new PersistedUser(userData);
@@ -130,13 +143,27 @@ export class PersistedUser extends DatabaseObject implements User {
     return resp;
   }
 
+  async save(): Promise<void> {
+    // Save the current state of the object to the database.
+    return prisma.user
+      .update({
+        where: { id: this.id },
+        data: {
+          name: this.name,
+          email: this.email,
+          role: this.role,
+        },
+      })
+      .then(() => Promise.resolve())
+      .catch((err) => Promise.reject(err));
+  }
+
   get name(): string {
     return this.m_name;
   }
 
   set name(name: string) {
     this.m_name = name;
-    prisma.user.update({ where: { id: this.id }, data: { name } });
   }
 
   get email(): string {
@@ -145,7 +172,6 @@ export class PersistedUser extends DatabaseObject implements User {
 
   set email(email: string) {
     this.m_email = email;
-    prisma.user.update({ where: { id: this.id }, data: { email } });
   }
 
   get role(): Role {
@@ -154,7 +180,6 @@ export class PersistedUser extends DatabaseObject implements User {
 
   set role(role: Role) {
     this.m_role = role;
-    prisma.user.update({ where: { id: this.id }, data: { role } });
   }
 }
 

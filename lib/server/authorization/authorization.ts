@@ -1,7 +1,7 @@
 import  * as policies from "@/lib/server/authorization/policies";
 import { User } from "@/lib/server/DatabaseModels/user";
 
-class Authorizer {
+export class Authorizer {
   private user: User;
   constructor(user: User) {
     this.user = user;
