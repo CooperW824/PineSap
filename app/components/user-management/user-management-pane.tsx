@@ -4,6 +4,7 @@ import { UserData } from "@/lib/server/DatabaseModels/user";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import UserCard from "./user-card";
+import PaginationControls from "../pagination-controls";
 
 export default function UserManagementPane({
   users,
@@ -14,6 +15,7 @@ export default function UserManagementPane({
 }) {
   const [reactiveUsers, setReactiveUsers] = useState<UserData[]>(users);
   const [reactiveCount, setReactiveCount] = useState<number>(count);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   return (
     <div className="flex flex-col gap-4 lg:items-start lg:justify-between">
@@ -29,7 +31,7 @@ export default function UserManagementPane({
         </button>
 
         <div className="rounded-2xl border border-base-300 bg-base-200/60 p-4 sm:p-5">
-          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="text-xl font-bold">Active Users</h2>
             <div className="badge badge-outline badge-lg px-4 py-3 text-sm font-medium">
               {reactiveCount} users
@@ -43,6 +45,14 @@ export default function UserManagementPane({
           <UserCard key={user.id} user={user} />
         ))}
       </div>
+
+      <PaginationControls
+        totalPages={Math.ceil(
+          reactiveCount / Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
+        )}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

@@ -6,7 +6,10 @@ export default async function UserManagementPage() {
 
   // Only listing the first 10 users when the page loads.
   // The user management pane will have pagination controls to load more users if needed.
-  const users = await PersistedUser.list(10, 0);
+  const users = await PersistedUser.list(
+    Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE),
+    0,
+  );
   return (
     <main
       data-theme="forest"
