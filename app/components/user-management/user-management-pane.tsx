@@ -22,6 +22,7 @@ export default function UserManagementPane({
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [createUserLoading, setCreateUserLoading] = useState(false);
   const [userCreationError, setUserCreationError] = useState<string | null>(
     null,
   );
@@ -29,6 +30,9 @@ export default function UserManagementPane({
 
   const handleCreateUser = async () => {
     if (!newUserName || !newUserEmail) return;
+
+    setCreateUserLoading(true);
+    setUserCreationError(null);
 
     const response = await fetch("/api/user-management/", {
       method: "POST",
@@ -91,6 +95,28 @@ export default function UserManagementPane({
     }
   };
 
+  const handleChangeUserRole = async (userId: string, newRole: string) => {
+    const response = await fetch("/api/user-management/role", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId, role: newRole }),
+    });
+
+    if (!response.ok) {
+      setUserUpdateError("Failed to update user role. Please try again.");
+    } else {
+      setUserUpdateError(null);
+      const updatedUser = await response.json();
+      setReactiveUsers((users) =>
+        users.map((user) =>
+          user.id === userId ? { ...user, role: updatedUser.user.role } : user,
+        ),
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 lg:items-start lg:justify-between">
       <h1 className="text-3xl font-bold sm:text-4xl">User Management</h1>
@@ -117,7 +143,11 @@ export default function UserManagementPane({
               className="btn btn-primary h-10 min-h-10 rounded-full px-6 text-sm font-medium shadow-none"
               onClick={handleCreateUser}
             >
-              Create User
+              {createUserLoading ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                "Create User"
+              )}
             </button>
           }
         >
@@ -172,7 +202,13 @@ export default function UserManagementPane({
 
       <div className="space-y-3 w-full">
         {reactiveUsers.map((user) => (
-          <UserCard key={user.id} user={user} onDelete={handleDeleteUser} onResetPassword={resetUserPassword} />
+          <UserCard
+            key={user.id}
+            user={user}
+            onDelete={handleDeleteUser}
+            onResetPassword={resetUserPassword}
+            onRoleChange={handleChangeUserRole}
+          />
         ))}
       </div>
 

@@ -7,10 +7,12 @@ export default function UserCard({
   user,
   onDelete,
   onResetPassword,
+  onRoleChange,
 }: {
   user: UserData;
   onDelete: (userId: string) => void;
   onResetPassword: (userId: string) => void;
+  onRoleChange: (userId: string, newRole: string) => void;
 }) {
   return (
     <article
@@ -48,6 +50,7 @@ export default function UserCard({
       <select
         className="select h-14 min-h-14 rounded-2xl border-base-300 bg-base-200 text-base font-semibold text-base-content shadow-none hover:border-primary/30 hover:bg-primary/10"
         defaultValue={user.role}
+        onChange={(e) => onRoleChange(user.id, e.target.value)}
       >
         <option value="admin">Admin</option>
         <option value="member">Member</option>

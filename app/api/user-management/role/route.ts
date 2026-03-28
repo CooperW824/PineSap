@@ -2,7 +2,7 @@ import { auth } from "@/lib/server/auth";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 
-export default async function PATCH(request: Request) {
+export async function PATCH(request: Request) {
     const callerSession = await auth.api.getSession({ headers: request.headers });
 
     if (!callerSession) {
