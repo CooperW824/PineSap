@@ -21,11 +21,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="forest">
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}>
         <div className="drawer min-h-screen lg:drawer-open">
           <input id="pinesap-drawer" type="checkbox" className="drawer-toggle" />
