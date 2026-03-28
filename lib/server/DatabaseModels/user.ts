@@ -2,6 +2,7 @@ import { Role } from "@/lib/server/authorization/roles";
 import { DatabaseObject } from "@/lib/server/DatabaseModels/database-object";
 import prisma from "@/lib/server/prisma";
 import { auth } from "../auth";
+import { headers } from "next/headers";
 
 export interface User {
   get id(): string;
@@ -116,7 +117,12 @@ export class PersistedUser extends DatabaseObject implements User {
   }
 
   async delete(): Promise<void> {
-    const resp = await auth.api.removeUser({ body: { userId: this.id } });
+    const resp = await auth.api.removeUser({
+      body: { userId: this.id },
+      headers: await headers(),
+      // We can get the headers from the orignal request context since this method would be called from the API route handlers where we have access to the request headers,
+      //  which include the authentication token.
+    });
     if (!resp.success) {
       throw new Error("Failed to delete user: ");
     }

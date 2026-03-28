@@ -17,7 +17,6 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
-    const error = urlParams.get("error");
     if (!token) {
       setError("Invalid Token - Please check the link in your email again.");
     } else {
@@ -32,7 +31,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    const { data, error } = await authClient.resetPassword({
+    const { error } = await authClient.resetPassword({
       token,
       newPassword,
     });

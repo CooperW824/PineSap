@@ -3,7 +3,13 @@
 import { ChevronDown, Plus, RotateCcw, Trash2, UserRound } from "lucide-react";
 import { UserData } from "@/lib/server/DatabaseModels/user";
 
-export default function UserCard({ user }: { user: UserData }) {
+export default function UserCard({
+  user,
+  onDelete,
+}: {
+  user: UserData;
+  onDelete: (userId: string) => void;
+}) {
   return (
     <article
       key={user.id}
@@ -22,6 +28,7 @@ export default function UserCard({ user }: { user: UserData }) {
       <button
         type="button"
         className="btn h-14 min-h-14 rounded-2xl border-base-300 bg-base-200 text-base font-semibold text-base-content shadow-none hover:border-error/30 hover:bg-error/10"
+        onClick={() => onDelete(user.id)}
       >
         <Trash2 className="h-4 w-4" />
         Delete User

@@ -25,6 +25,7 @@ export default function UserManagementPane({
   const [userCreationError, setUserCreationError] = useState<string | null>(
     null,
   );
+  const [userUpdateError, setUserUpdateError] = useState<string | null>(null);
 
   const handleCreateUser = async () => {
     if (!newUserName || !newUserEmail) return;
@@ -51,6 +52,23 @@ export default function UserManagementPane({
     } else {
       setUserCreationError("Failed to create user. Please try again.");
       console.error("Failed to create user:", await response.text());
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    const response = await fetch("/api/user-management/", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: userId }),
+    });
+
+    if (!response.ok) {
+      setUserUpdateError("Failed to delete user. Please try again.");
+    } else {
+      setReactiveUsers((users) => users.filter((user) => user.id !== userId));
+      setReactiveCount((count) => count - 1);
     }
   };
 
@@ -129,9 +147,13 @@ export default function UserManagementPane({
         </div>
       </div>
 
+      {userUpdateError && (
+        <p className="text-sm text-red-500 mb-2">{userUpdateError}</p>
+      )}
+
       <div className="space-y-3 w-full">
         {reactiveUsers.map((user) => (
-          <UserCard key={user.id} user={user} />
+          <UserCard key={user.id} user={user} onDelete={handleDeleteUser} />
         ))}
       </div>
 
