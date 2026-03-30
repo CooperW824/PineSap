@@ -6,10 +6,22 @@ import {
   DollarSign,
   Settings,
   PanelLeftClose,
-  ArrowRightFromLine,
 } from "lucide-react";
+import { auth } from "@/lib/server/auth";
+import { headers } from "next/headers";
+import { Authorizer } from "@/lib/server/authorization/authorization";
+import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 
-export default function SideBar() {
+export default async function SideBar() {
+  let isAdmin = false;
+  const user = await auth.api.getSession({ headers: await headers() });
+
+  if (user) {
+    const persistedUser = await PersistedUser.getById(user.user.id);
+    const authorizer = new Authorizer(persistedUser!);
+    isAdmin = authorizer.users().canChangeRole();
+  }
+
   const itemClasses =
     "flex is-drawer-close:tooltip is-drawer-close:tooltip-right is-drawer-close:grid-cols-1 is-drawer-close:justify-center is-drawer-close:px-0 h-8";
 
@@ -56,38 +68,41 @@ export default function SideBar() {
           </li>
 
           <li>
-            <Link
-              href="/user-management"
-              className={itemClasses}
-              data-tip="User Management"
-            >
-              <Users className="h-5 w-5" />
-              <span className="is-drawer-close:hidden">User Management</span>
-            </Link>
-          </li>
-
-          <li>
             <Link href="/budget" className={itemClasses} data-tip="Budget">
               <DollarSign className="h-5 w-5" />
               <span className="is-drawer-close:hidden">Budget</span>
             </Link>
           </li>
-        </ul>
 
-        <div className="w-full pb-4">
-          <ul className="menu w-full">
+          {isAdmin && (
             <li>
               <Link
-                href="/admin-panel"
+                href="/user-management"
                 className={itemClasses}
-                data-tip="Admin Settings"
+                data-tip="User Management"
               >
-                <Settings className="h-5 w-5" />
-                <span className="is-drawer-close:hidden">Admin Settings</span>
+                <Users className="h-5 w-5" />
+                <span className="is-drawer-close:hidden">User Management</span>
               </Link>
             </li>
-          </ul>
-        </div>
+          )}
+        </ul>
+        {isAdmin && (
+          <div className="w-full pb-4">
+            <ul className="menu w-full">
+              <li>
+                <Link
+                  href="/admin-panel"
+                  className={itemClasses}
+                  data-tip="Admin Settings"
+                >
+                  <Settings className="h-5 w-5" />
+                  <span className="is-drawer-close:hidden">Admin Settings</span>
+                </Link>
+              </li>
+            </ul>
+          </div>
+        )}
       </aside>
     </div>
   );

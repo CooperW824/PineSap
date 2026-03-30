@@ -1,3 +1,4 @@
+import prisma from "@/lib/server/prisma";
 import { createAuthClient } from "better-auth/client";
 import { Command } from "commander";
 import * as readline from "readline";
@@ -84,6 +85,19 @@ program.action(async (options: BootstrapOptions) => {
 
   if (resp.error) {
     resp.error && console.error("Error during sign-up:", resp.error);
+    process.exit(1);
+  }
+
+  // Giving the user the "admin" role so they can access the admin panel and manage other users.
+  const user = resp.data.user;
+
+  const roleResp = await prisma.user.update({
+    where: { id: user.id },
+    data: { role: "admin" },
+  });
+
+  if (!roleResp) {
+    console.error("Failed to assign admin role to the user.");
     process.exit(1);
   }
 
