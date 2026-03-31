@@ -6,21 +6,27 @@ export class Item {
     id: number
     name: string
     price: number
+    quantity: number
     description?: string
+    physicalLocation ?: string
 
 
     /// Cosntructor
     // apparently its illegal to have an asynch contructor, so we can't fetch from DB here?
-    constructor(data: {
+    protected constructor(data: {
     id: number
     name: string
     price: number
+    quantity: number
     description?: string
+    physicalLocation ?: string
   }) {
     this.id = data.id
     this.name = data.name
     this.price = data.price
+    this.quantity = data.quantity
     this.description = data.description
+    this.physicalLocation = data.physicalLocation
   }
 
     // do we delete this function now? since fromID does basically the same thing. 
@@ -36,23 +42,9 @@ export class Item {
             id: item.id,
             name: item.name,
             price: item.price,
+            quantity: item.quantity,
             description: item.description ?? undefined, // says this desc may be null
-        })
-    }
-
-    /// Create from DB by ID
-    static async fromId(itemId: number): Promise<Item | null> {
-        const item = await prisma.item.findUnique({
-        where: { id: itemId },
-        })
-
-        if (!item) return null
-
-        return new Item({
-        id: item.id,
-        name: item.name,
-        price: Number(item.price),
-        description: item.description ?? undefined,
+            physicalLocation: item.physicalLocation ?? undefined, // says this desc may be null
         })
     }
     
@@ -69,7 +61,9 @@ export class Item {
         id: item.id,
         name: item.name,
         price: Number(item.price),
+        quantity: Number(item.quantity),
         description: item.description ?? undefined,
+        physicalLocation: item.physicalLocation ?? undefined,
         })
     }
 
@@ -83,10 +77,19 @@ export class Item {
     getPrice(): number {
         return this.price
     }
+    getQuantity(): number {
+        return this.price
+    }
     getDesc(): string | null {
         if(!this.description){return null}
         else{
             return this.description
+        }
+    }
+    getPhysicalLocation(): string | null {
+        if(!this.physicalLocation){return null}
+        else{
+            return this.physicalLocation
         }
     }
     
@@ -107,6 +110,13 @@ export class Item {
     })
     this.price = newPrice
   }
+    async setQuantity(newQuantity: number): Promise<void> {
+    await prisma.item.update({
+      where: { id: this.id },
+      data: { price: newQuantity },
+    })
+    this.price = newQuantity
+  }
     async setDescription(newDescription: string): Promise<void> {
     // update DB
     await prisma.item.update({
@@ -115,6 +125,15 @@ export class Item {
     })
     // update local object
     this.description = newDescription
+  }
+    async setPhysicalLocation(newPhysicalLocation: string): Promise<void> {
+    // update DB
+    await prisma.item.update({
+      where: { id: this.id },
+      data: { description: newPhysicalLocation },
+    })
+    // update local object
+    this.description = newPhysicalLocation
   }
 
   // special functions
