@@ -8,22 +8,35 @@ import PaginationControls from "./pagination-controls";
 
 type PaginationProps = {
   items: InventoryItem[];
+  count: number;
   itemsPerPage?: number;
 };
 
 export default function Pagination({
   items,
+  count,
   itemsPerPage = 10,
 }: PaginationProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [paginatedItems, setPaginatedItems] = useState<InventoryItem[]>(items);
+  const [paginatedCount, setPaginatedCount] = useState<number>(count);
 
-  const totalPages = Math.ceil(items.length / itemsPerPage);
-  const paginatedItems = items.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(paginatedCount / itemsPerPage);
 
-  if (items.length === 0) {
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    fetch(`/api/inventory?page=${newPage}&limit=${itemsPerPage}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPaginatedItems(data.items);
+        setPaginatedCount(data.count);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch inventory for page " + newPage, err);
+      });
+  };
+
+  if (paginatedCount === 0) {
     return (
       <p className="rounded-box border border-base-300 bg-base-200 p-4 text-sm opacity-70">
         No inventory items to display.
@@ -44,7 +57,7 @@ export default function Pagination({
           <PaginationControls
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={handlePageChange}
           />
         </div>
       )}

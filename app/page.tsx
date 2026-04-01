@@ -1,11 +1,12 @@
 import { Filter, Search } from "lucide-react";
-import { getInventoryItems } from "@/lib/server/inventory/items";
+import { getInventoryItems, getInventoryItemCount } from "@/lib/server/inventory/items";
 
 import Pagination from "./components/pagination";
 
 // added async so we can await the fetch of inventory items, not sure if this is the best way but It works 
 export default async function Home() {
-  const inventoryItems = await getInventoryItems();
+  const inventoryItems = await getInventoryItems(1, Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE));
+  const count = await getInventoryItemCount();
 
   return (
     <main className="min-h-screen w-full p-6 bg-base-100 text-base-content flex flex-col items-center">
@@ -48,7 +49,7 @@ export default async function Home() {
             </button>
           </div>
 
-          <Pagination items={inventoryItems} />
+          <Pagination items={inventoryItems} count={count} />
         </section>
       </div>
     </main>

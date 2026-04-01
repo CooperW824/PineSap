@@ -4,7 +4,6 @@ of an item. this file is where app/page.tsx and item-selection/page.tsx both pul
 information from. This being here serves to make it easier to refactor for database
 calls later.
 */
-1
 import { Item } from "../database/item"
 
 export type InventoryItem = {
@@ -18,9 +17,14 @@ export type InventoryItem = {
   stockQuantity: number;
 };
 
+export async function getInventoryItemCount(): Promise<number> {
+  return Item.count();
+}
+
 // for displaying across home page
-export async function getInventoryItems(): Promise<InventoryItem[]> {
-  const items = await Item.list();
+// show 10 items per page, 
+export async function getInventoryItems(page: number = 1, limit: number = 10): Promise<InventoryItem[]> {
+  const items = await Item.list(limit, page);
   return items.map(item => ({
     id: item.getId(),
     createdAt: item.getCreatedAt(),

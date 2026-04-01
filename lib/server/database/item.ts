@@ -154,9 +154,17 @@ export class Item {
 
     // special functions
 
-    // Fetch all items from DB
-    static async list(): Promise<Item[]> {
-        const items = await prisma.item.findMany()
+    // -- INVENTORY FUNCTIONS --
+    static async count(): Promise<number> {
+        return prisma.item.count();
+    }
+
+    static async list(page_size: number, page_number: number): Promise<Item[]> {
+        const items = await prisma.item.findMany({
+            take: page_size,
+            skip: (page_number - 1) * page_size,
+            orderBy: { createdAt: "desc" },
+        })
 
         return items.map(item => new Item({
             id: item.id,
@@ -170,3 +178,4 @@ export class Item {
         }))
     }
 }
+// ---------------------------------
