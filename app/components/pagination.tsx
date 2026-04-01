@@ -4,6 +4,7 @@ import { useState } from "react";
 import { type InventoryItem } from "@/lib/server/inventory/items";
 
 import ItemBox from "./item-box";
+import PaginationControls from "./pagination-controls";
 
 type PaginationProps = {
   items: InventoryItem[];
@@ -40,27 +41,11 @@ export default function Pagination({
 
       {totalPages > 1 && (
         <div className="flex justify-center mt-8 w-full">
-          <div className="join shadow-sm">
-            <button
-              className="join-item btn"
-              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-              disabled={currentPage === 1}
-            >
-              «
-            </button>
-            <button className="join-item btn no-animation pointer-events-none bg-base-200 hover:bg-base-200">
-              Page {currentPage} of {totalPages}
-            </button>
-            <button
-              className="join-item btn"
-              onClick={() =>
-                setCurrentPage((page) => Math.min(totalPages, page + 1))
-              }
-              disabled={currentPage === totalPages}
-            >
-              »
-            </button>
-          </div>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
     </>
