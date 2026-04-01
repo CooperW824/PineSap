@@ -23,19 +23,19 @@ export default function ItemBox({ item }: ItemBoxProps) {
         <div className="flex justify-between items-start gap-4">
           <div className="flex flex-col min-w-0 flex-1">
             <h3 className="card-title text-[15px] m-0 leading-tight">
-              {item.title}
+              {item.name}
             </h3>
             <p className="text-[13px] opacity-70 mt-1 m-0 leading-tight">
-              {truncateText(item.description, 82)}
+              {truncateText(item.description ?? "", 82)}
             </p>
           </div>
 
           <div className="flex flex-col text-right shrink-0">
             <p className="font-semibold text-[15px] m-0 leading-tight">
-              {item.location}
+              {item.physicalLocation}
             </p>
             <p className="text-[13px] opacity-70 mt-1 m-0 leading-tight">
-              Qty: {item.quantity}
+              Qty: {item.stockQuantity}
             </p>
           </div>
         </div>
