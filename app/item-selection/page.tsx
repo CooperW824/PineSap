@@ -1,0 +1,126 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { getInventoryItemById } from "@/lib/server/inventory/items";
+
+const detailCardClassName =
+  "rounded-2xl border border-base-300 bg-base-100 px-4 py-4 shadow-sm";
+
+function DetailField({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div className={`${detailCardClassName} ${className}`.trim()}>
+      <p className="text-sm font-semibold text-base-content/70">{label}</p>
+      <p className="mt-2 whitespace-pre-wrap text-base text-base-content">{value}</p>
+    </div>
+  );
+}
+
+function BackButton() {
+  return (
+    <Link
+      href="/"
+      className="btn h-12 min-h-12 rounded-2xl border-base-300 bg-base-200 px-5 text-base font-semibold text-base-content shadow-none hover:border-base-300 hover:bg-base-300/60"
+    >
+      <ArrowLeft className="h-4 w-4" />
+      Back to Home
+    </Link>
+  );
+}
+
+type ItemSelectionPageProps = {
+  searchParams?: Promise<{
+    itemId?: string | string[];
+  }>;
+};
+
+export default async function ItemSelectionPage({
+  searchParams,
+}: ItemSelectionPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const itemId = Array.isArray(resolvedSearchParams.itemId)
+    ? resolvedSearchParams.itemId[0]
+    : resolvedSearchParams.itemId;
+  const selectedItem = itemId ? getInventoryItemById(itemId) : undefined;
+
+  return (
+    <main
+      data-theme="forest"
+      className="min-h-[calc(100vh-4rem)] w-full bg-base-100 px-4 py-6 text-base-content sm:px-6 lg:px-10"
+    >
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <section className="rounded-3xl border border-base-300 bg-base-100 shadow-sm">
+          <div className="flex flex-col gap-8 px-6 py-8 sm:px-8 lg:px-10">
+            <div>
+              <BackButton />
+            </div>
+
+            {!selectedItem ? (
+              <section className="rounded-2xl border border-dashed border-base-300 bg-base-200/40 p-8 text-center shadow-sm">
+                <h1 className="text-3xl font-bold sm:text-4xl">No Item Selected</h1>
+                <p className="mt-3 text-base text-base-content/70">
+                  Choose an item from the home inventory list to view its details here.
+                </p>
+              </section>
+            ) : (
+              <>
+                <div className="max-w-4xl">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-base-content/55">
+                    Item Details
+                  </p>
+                  <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
+                    {selectedItem.title}
+                  </h1>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <div className="badge badge-outline badge-lg px-4 py-3 text-sm font-medium">
+                      {selectedItem.location}
+                    </div>
+                  </div>
+                </div>
+
+                <section className="rounded-2xl border border-base-300 bg-base-200/60 p-4 sm:p-6">
+
+
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <DetailField
+                      label="Description of Item"
+                      value={selectedItem.description}
+                      className="lg:col-span-2"
+                    />
+                    <DetailField
+                      label="Quantity of Item"
+                      value={String(selectedItem.quantity)}
+                    />
+                    <DetailField
+                      label="Place it was Purchased From"
+                      value={selectedItem.purchasedFrom}
+                    />
+                    <DetailField label="Prior Cost" value={selectedItem.priorCost} />
+                    <DetailField
+                      label="Prior Vendor"
+                      value={selectedItem.priorVendor}
+                    />
+                    <DetailField
+                      label="Person Who Requested"
+                      value={selectedItem.requestedBy}
+                    />
+                    <DetailField
+                      label="Person Who Approved"
+                      value={selectedItem.approvedBy}
+                    />
+                  </div>
+                </section>
+              </>
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}

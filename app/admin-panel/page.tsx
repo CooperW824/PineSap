@@ -1,10 +1,19 @@
-export default function AdminPanelPage() {
+import AdminClubNameEditor from "../components/admin-club-name-editor";
+import AdminProjectList from "../components/admin-project-list";
+
+export default function AdminSettingsClient() {
   return (
-    <main
-      data-theme="forest"
-      className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center bg-base-100 py-2 text-base-content"
-    >
-      <h1 className="text-4xl font-bold mb-4">Welcome to Admin Panel!</h1>
+    <main className="min-h-screen w-full p-6 bg-base-100 text-base-content">
+      {/* PAGE HEADER */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Admin Settings</h1>
+      </div>
+
+      <AdminClubNameEditor />
+
+      <hr className="my-6 border-border-300 border-base-300" />
+
+      <AdminProjectList />
     </main>
   );
 }

@@ -1,11 +1,11 @@
+import prisma from "@/lib/server/prisma";
 import { createAuthClient } from "better-auth/client";
 import { Command } from "commander";
 import * as readline from "readline";
 
 const client = createAuthClient({
-  baseURL: "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 });
-
 
 // General-purpose prompt function
 function prompt(question: string): Promise<string> {
@@ -74,7 +74,7 @@ program.action(async (options: BootstrapOptions) => {
       password,
       fetchOptions: {
         headers: {
-          Origin: "http://localhost:3000",
+          Origin: process.env.BETTER_AUTH_URL || "http://localhost:3000",
         },
       },
     })
@@ -85,6 +85,19 @@ program.action(async (options: BootstrapOptions) => {
 
   if (resp.error) {
     resp.error && console.error("Error during sign-up:", resp.error);
+    process.exit(1);
+  }
+
+  // Giving the user the "admin" role so they can access the admin panel and manage other users.
+  const user = resp.data.user;
+
+  const roleResp = await prisma.user.update({
+    where: { id: user.id },
+    data: { role: "admin" },
+  });
+
+  if (!roleResp) {
+    console.error("Failed to assign admin role to the user.");
     process.exit(1);
   }
 

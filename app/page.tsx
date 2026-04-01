@@ -1,22 +1,54 @@
-import { auth } from "@/lib/server/auth"; // path to your Better Auth server instance
-import { headers } from "next/headers";
+import { Filter, Search } from "lucide-react";
+import { getInventoryItems } from "@/lib/server/inventory/items";
 
-export default async function Home() {
-  const session = await auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
-  });
+import Pagination from "./components/pagination";
+
+export default function Home() {
+  const inventoryItems = getInventoryItems();
 
   return (
-    <main
-      data-theme="forest"
-      className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center bg-base-100 py-2 text-base-content"
-    >
-      <h1 className="text-4xl font-bold mb-4">Welcome to PineSap!</h1>
-      {session ? (
-        <p className="text-lg">You are logged in as {session.user.name}</p>
-      ) : (
-        <p className="text-lg">You are not logged in.</p>
-      )}
+    <main className="min-h-screen w-full p-6 bg-base-100 text-base-content flex flex-col items-center">
+      <div className="w-full max-w-4xl mb-8">
+        <h1 className="text-3xl font-bold">Inventory</h1>
+      </div>
+
+      <div className="w-full max-w-4xl space-y-8">
+        <section className="flex flex-col gap-2">
+          <label htmlFor="club-select" className="text-sm font-semibold opacity-70 ml-1">
+            Project Name
+          </label>
+          <select
+            id="club-select"
+            className="select select-bordered w-full max-w-xs bg-base-200"
+            defaultValue="Project A"
+          >
+            <option>Project A</option>
+            <option>Project B</option>
+            <option>Project C</option>
+          </select>
+        </section>
+
+        <section className="space-y-4 w-full">
+          <h2 className="text-lg font-semibold">All Items</h2>
+
+          <div className="flex w-full gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Search items..."
+                className="input input-bordered w-full pr-10 bg-base-200"
+              />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 opacity-50" />
+            </div>
+
+            <button className="btn btn-square bg-base-200 border-base-content/20 hover:bg-base-300">
+              <Filter className="h-5 w-5 opacity-70" />
+            </button>
+          </div>
+
+          <Pagination items={inventoryItems} />
+        </section>
+      </div>
     </main>
   );
 }
