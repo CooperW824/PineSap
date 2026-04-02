@@ -1,5 +1,6 @@
-import { prisma } from "../prisma"
-import { Item } from "./Item" 
+import prisma from "../prisma" //fixed the import, was wrong
+import { Item } from "./item" 
+import { RequestStatus } from "@/app/generated/prisma/client"
 
 //item definetion got getItems
 // not sure if this is what you mean cooper
@@ -16,16 +17,19 @@ type ItemData = {
 export class Request {
   id: number
   name: string
-  status: string
-
+  purpose: string | null
+  status: RequestStatus
+  
   /// PRIVATE constructor
   private constructor(data: {
     id: number
     name: string
-    status: string
+    status: RequestStatus
+    purpose: string | null
   }) {
     this.id = data.id
     this.name = data.name
+    this.purpose = data.purpose
     this.status = data.status
   }
 
@@ -40,6 +44,7 @@ export class Request {
     return new Request({
       id: request.id,
       name: request.name,
+      purpose: request.purpose,
       status: request.status,
     })
   }
@@ -56,28 +61,29 @@ export class Request {
     return new Request({
       id: request.id,
       name: request.name,
+      purpose: request.purpose,
       status: request.status,
     })
   }
 
   /// Get all items in this request
   async getItems(): Promise<ItemData[]> {
-  const requestItems = await prisma.requestItem.findMany({
-    where: { requestId: this.id },
-    include: {
-      item: true,
-    },
-  })
+    const requestItems = await prisma.requestItem.findMany({
+      where: { requestId: this.id },
+      include: {
+        item: true,
+      },
+    })
 
-  return requestItems.map((ri: typeof requestItems[number]): ItemData => ({
-    id: ri.item.id,
-    name: ri.item.name,
-    price: Number(ri.item.price),
-    quantity: ri.quantity,
-    description: ri.item.description,
-    physicalLocation: ri.item.physicalLocation,
-  }))
-}
+    return requestItems.map((ri: typeof requestItems[number]): ItemData => ({
+      id: ri.item.id,
+      name: ri.item.name,
+      price: Number(ri.item.price),
+      quantity: ri.quantity,
+      description: ri.item.description,
+      physicalLocation: ri.item.physicalLocation,
+    }))
+  }
 
   // should this instead take in an item object and quantity? 
   /// Add item to request
@@ -104,6 +110,15 @@ export class Request {
   getStatus(): string {
     return this.status
   }
+  getPurpose(): string | null {
+    return this.status
+  }
+
+  // Compute total price dynamically from items
+  async getTotalRequestPrice(): Promise<number> {
+    const items = await this.getItems()
+    return items.reduce((total, item) => total + (item.price * item.quantity), 0)
+  }
 
   // SETTERS
   async setName(newName: string): Promise<void> {
@@ -114,7 +129,16 @@ export class Request {
     this.name = newName
   }
 
-  async setStatus(newStatus: string): Promise<void> {
+  // didn't have this before, woops
+  async setPurpose(newPurpose: string): Promise<void> {
+    await prisma.request.update({
+      where: { id: this.id },
+      data: { purpose: newPurpose },
+    })
+    this.purpose = newPurpose
+  }
+
+  async setStatus(newStatus: RequestStatus): Promise<void> {
     await prisma.request.update({
       where: { id: this.id },
       data: { status: newStatus },
@@ -124,10 +148,10 @@ export class Request {
 
   // other methods
   async approve(): Promise<void> {
-    await this.setStatus("APPROVED")
+    await this.setStatus(RequestStatus.APPROVED)
   }
 
   async deny(): Promise<void> {
-    await this.setStatus("DENIED")
+    await this.setStatus(RequestStatus.DENIED)
   }
 }

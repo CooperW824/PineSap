@@ -52,20 +52,20 @@ model Request {
   // We can perhaps have a pending bool field instead. 
 
   // TODO: Verify if we should store this and if there's a way to automate it from items.  
-  price Decimal @db.Decimal(20, 2) /// The last known price of an item.
-
+  // totalRequestPrice Decimal @db.Decimal(20, 2) /// The last known price of an item.
+  // removing this for NOW
   // TODO: Add in any more fields
 
 
   requestItems RequestItem[] /// The items contained in the request. 
 }
-
 /// Statuses of a request. 
 enum RequestStatus {
   PENDING
   APPROVED
   DENIED
 }
+
 
 // This essentially means there is one RequestItem for every Item and Request pair made.  
 /// Explicit many to many relationship between items and request. 

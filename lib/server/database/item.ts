@@ -1,11 +1,12 @@
-import { prisma } from "../prisma"
+import { Decimal } from "@prisma/client/runtime/client"
+import prisma from "../prisma" //fixed the import, was wrong
 
 /// Class for items in the DB
 export class Item {
     // Local variables
     id: number
     name: string
-    price: number
+    price: Decimal
     quantity: number
     description?: string
     physicalLocation ?: string
@@ -16,7 +17,7 @@ export class Item {
     protected constructor(data: {
     id: number
     name: string
-    price: number
+    price: Decimal
     quantity: number
     description?: string
     physicalLocation ?: string
@@ -42,7 +43,7 @@ export class Item {
             id: item.id,
             name: item.name,
             price: item.price,
-            quantity: item.quantity,
+            quantity: item.stockQuantity,
             description: item.description ?? undefined, // says this desc may be null
             physicalLocation: item.physicalLocation ?? undefined, // says this desc may be null
         })
@@ -60,8 +61,8 @@ export class Item {
         return new Item({
         id: item.id,
         name: item.name,
-        price: Number(item.price),
-        quantity: Number(item.quantity),
+        price: item.price,
+        quantity: Number(item.stockQuantity),
         description: item.description ?? undefined,
         physicalLocation: item.physicalLocation ?? undefined,
         })
@@ -74,11 +75,11 @@ export class Item {
     getName(): string {
         return this.name
     }
-    getPrice(): number {
+    getPrice(): Decimal {
         return this.price
     }
     getQuantity(): number {
-        return this.price
+        return this.quantity
     }
     getDesc(): string | null {
         if(!this.description){return null}
@@ -103,14 +104,14 @@ export class Item {
     // update local object
     this.name = newName
   }
-    async setPrice(newPrice: number): Promise<void> {
+    async setPrice(newPrice: Decimal): Promise<void> {
     await prisma.item.update({
       where: { id: this.id },
       data: { price: newPrice },
     })
     this.price = newPrice
   }
-    async setQuantity(newQuantity: number): Promise<void> {
+    async setQuantity(newQuantity: Decimal): Promise<void> {
     await prisma.item.update({
       where: { id: this.id },
       data: { price: newQuantity },

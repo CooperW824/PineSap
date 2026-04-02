@@ -1,25 +1,20 @@
 // import { ChevronDown, Plus, RotateCcw, Trash2, UserRound } from "lucide-react";
 import Link from "next/link"
-
+import prisma from "@/lib/server/prisma"
 // sample requests, delete later
-const sampleRequests = [
-  {
-    name: "the most important purchase",
-    totalItems: "1",
-    totalPrice: "67",
-    Requester: "Important guy",
-    status: "APROVED",
-  },
-  {
-    name: "PLEASE WE NEED THIS",
-    totalItems: "999",
-    totalPrice: "0.03",
-    Requester: "not important guy",
-    status: "DENIED",
-  },
-];
 
-export default function RequestsPage() {
+const requests = await prisma.request.findMany()
+
+
+
+export default async function RequestsPage() {
+
+  const requests = await prisma.request.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
+
   return (
     <main className="p-6">
       <div className="flex justify-between items-center">
@@ -35,7 +30,7 @@ export default function RequestsPage() {
       <div className="space-y-3">
         <div className="mt-6 rounded-2xl bg-base-200 p-6">
           <div className="space-y-4">
-            {sampleRequests.map((request) => (
+            {requests.map((request) => (
               <Link
                 key={request.name}
                 href="/requests/view"
@@ -47,14 +42,13 @@ export default function RequestsPage() {
                   <div className="flex justify-between">
                     
                     <div>
-                      <p className="font-bold">Name: {request.name}</p>
+                      <p className="font-bold">Name: {request.name || "Untitled Request"}</p>
                       <p>Status: {request.status}</p>
-                      <p>Requester: {request.Requester}</p>
+                      <p>Purpose: {request.purpose || "No purpose provided"}</p>
                     </div>
 
                     <div className="text-right">
-                      <p>Items: {request.totalItems}</p>
-                      <p>Price: {request.totalPrice}</p>
+                      <p>Price: {Number(67).toFixed(2)}</p>
                     </div>
 
                   </div>

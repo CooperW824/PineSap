@@ -1,4 +1,6 @@
+"use client" // i believe this is okay here, instead of being in a component like the other stuff?
 import { Trash2, Pencil } from "lucide-react";
+import { useState } from "react" 
 
 // sample items, delete later
 const sampleItems = [
@@ -17,6 +19,32 @@ const sampleItems = [
 ];
 
 export default function CreateRequestPage() {
+
+const [name, setName] = useState("")
+const [purpose, setPurpose] = useState("")
+
+// handles submitting the user inputted data to the API
+async function handleCreateRequest() {
+  const res = await fetch("/api/requests/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      purpose,
+    }),
+  })
+
+  if (!res.ok) {
+    console.error("Failed to create request")
+    return
+  }
+
+  const data = await res.json()
+  console.log("Created request ID:", data.id)
+}
+
   return (
     <main className="p-6">
       <h1 className="text-3xl font-bold">Create Request</h1>
@@ -38,12 +66,16 @@ export default function CreateRequestPage() {
           type="text"
           placeholder="Request Name"
           className="input input-bordered w-full"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
 
         {/* purpose */}
         <textarea
           placeholder="Purpose"
           className="textarea textarea-bordered w-full"
+          value={purpose}
+          onChange={(e) => setPurpose(e.target.value)}
         />
 
         {/* items */}
@@ -85,7 +117,12 @@ export default function CreateRequestPage() {
         </div>
 
         {/* SUBMIT BUTTON */}
-        <button className="btn btn-primary">Submit Request</button>
+        <button
+          onClick={handleCreateRequest}
+          className="btn btn-primary"
+        >
+          Submit Request
+        </button>
       </div>
     </main>
   );
