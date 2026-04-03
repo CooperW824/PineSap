@@ -29,8 +29,8 @@ model Item {
   placeOfPurchase  String? @db.VarChar(100) /// Where the item will be or was purchased from. 
 
   // TODO: Verify if this is a good way of storing price.  
-  price         Decimal @db.Decimal(20, 2) /// The last known price of an item.
-  stockQuantity Int     @default(0) /// The amount of an item in stock. 
+  price         Float /// The last known price of an item.
+  stockQuantity Int   @default(0) /// The amount of an item in stock. 
 
   // TODO: Add in any more fields
 
@@ -72,7 +72,7 @@ enum RequestStatus {
 // This essentially means there is one RequestItem for every Item and Request pair made.  
 /// Explicit many to many relationship between items and request. 
 model RequestItem {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   request   Request @relation(fields: [requestId], references: [id])
   requestId String /// The id of the request. 

@@ -4,7 +4,7 @@ import { RequestStatus } from "@/generated/prisma/client";
 
 //item definetion got getItems
 // not sure if this is what you mean cooper
-type ItemData = {
+export type ItemData = {
 	id: string;
 	name: string;
 	price: number;
@@ -72,12 +72,14 @@ export class Request {
 	}
 
 	/// Get all items in this request
-	async getItems(): Promise<ItemData[]> {
+	async getItems(pageNumber: number, itemsPerPage: number): Promise<ItemData[]> {
 		const requestItems = await prisma.requestItem.findMany({
 			where: { requestId: this.id },
 			include: {
 				item: true,
 			},
+			take: itemsPerPage,
+			skip: (pageNumber - 1) * itemsPerPage,
 		});
 
 		return requestItems.map(
@@ -92,17 +94,46 @@ export class Request {
 		);
 	}
 
+	async countItems(): Promise<number> {
+		return prisma.requestItem.count({
+			where: { requestId: this.id },
+		});
+	}
+
 	// should this instead take in an item object and quantity?
 	/// Add item to request
-	async addItem(itemId: string, quantity: number, price: number): Promise<void> {
-		await prisma.requestItem.create({
+	async addItem(
+		name: string,
+		price: number,
+		quantity: number,
+		description: string | null,
+	): Promise<ItemData> {
+		const item = await prisma.item.create({
+			data: {
+				name,
+				price,
+				stockQuantity: quantity,
+				description,
+			},
+		});
+
+		const requestItem = await prisma.requestItem.create({
 			data: {
 				requestId: this.id,
-				itemId,
+				itemId: item.id,
 				quantity,
 				price,
 			},
 		});
+
+		return {
+			id: item.id,
+			name: item.name,
+			price: Number(item.price),
+			quantity: requestItem.quantity,
+			description: item.description,
+			physicalLocation: item.physicalLocation,
+		};
 	}
 
 	// GETTERS
@@ -126,8 +157,13 @@ export class Request {
 
 	// Compute total price dynamically from items
 	async getTotalRequestPrice(): Promise<number> {
-		const items = await this.getItems();
-		return items.reduce((total, item) => total + item.price * item.quantity, 0);
+		const items = await prisma.requestItem.findMany({
+			where: { requestId: this.id },
+			include: {
+				item: true,
+			},
+		});
+		return items.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
 	}
 
 	// SETTERS
