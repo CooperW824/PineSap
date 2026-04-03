@@ -73,7 +73,7 @@ export default function RequestItemsList({
 			</button>
 			<ul className="divide-y divide-gray-200">
 				{requestItems.map((item) => (
-					<ItemCard key={item.id} item={item} />
+					<ItemCard key={item.id} item={item} requestId={requestId} />
 				))}
 			</ul>
 			<PaginationControls

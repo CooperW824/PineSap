@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 
 import { ItemData } from "@/lib/server/database/request";
 
-export default function ItemCard({ item }: { item: ItemData }) {
+export default function ItemCard({ item, requestId }: { item: ItemData; requestId: string }) {
 	const [error, setError] = useState<string | null>(null);
 	const [editedItem, setEditedItem] = useState<ItemData>(item);
 
 	const updateItem = async () => {
-		const resp = await fetch(`/api/request/items/?id=${item.id}`, {
+		const resp = await fetch(`/api/request/items/?id=${requestId}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
