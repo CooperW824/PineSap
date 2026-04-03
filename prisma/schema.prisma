@@ -19,7 +19,7 @@ datasource db {
 
 /// A type of item that can be on campus or pending in a request. 
 model Item {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   createdAt DateTime @default(now())
 
@@ -77,8 +77,8 @@ model RequestItem {
   request   Request @relation(fields: [requestId], references: [id])
   requestId String /// The id of the request. 
 
-  item   Item @relation(fields: [itemId], references: [id])
-  itemId Int /// The id of the item in the request. 
+  item   Item   @relation(fields: [itemId], references: [id])
+  itemId String /// The id of the item in the request. 
 
   quantity Int /// The nummber of items for a request. 
   price    Decimal @db.Decimal(20, 2) /// Price at the time of request creation. 

@@ -5,7 +5,7 @@ import { RequestStatus } from "@/generated/prisma/client";
 //item definetion got getItems
 // not sure if this is what you mean cooper
 type ItemData = {
-	id: number;
+	id: string;
 	name: string;
 	price: number;
 	quantity: number;
@@ -14,26 +14,29 @@ type ItemData = {
 };
 
 export class Request {
-	id: number;
-	name: string;
-	purpose: string | null;
-	status: RequestStatus;
+	private id: string;
+	private name: string;
+	private purpose: string | null;
+	private status: RequestStatus;
+	private ownerId: string;
 
 	/// PRIVATE constructor
 	private constructor(data: {
-		id: number;
+		id: string;
 		name: string;
 		status: RequestStatus;
 		purpose: string | null;
+		ownerId: string;
 	}) {
 		this.id = data.id;
 		this.name = data.name;
 		this.purpose = data.purpose;
 		this.status = data.status;
+		this.ownerId = data.ownerId;
 	}
 
 	/// Fetch from DB by ID
-	static async fromId(requestId: number): Promise<Request | null> {
+	static async fromId(requestId: string): Promise<Request | null> {
 		const request = await prisma.request.findUnique({
 			where: { id: requestId },
 		});
@@ -45,6 +48,7 @@ export class Request {
 			name: request.name,
 			purpose: request.purpose,
 			status: request.status,
+			ownerId: request.ownerId,
 		});
 	}
 
@@ -63,6 +67,7 @@ export class Request {
 			name: request.name,
 			purpose: request.purpose,
 			status: request.status,
+			ownerId: request.ownerId,
 		});
 	}
 
@@ -89,7 +94,7 @@ export class Request {
 
 	// should this instead take in an item object and quantity?
 	/// Add item to request
-	async addItem(itemId: number, quantity: number, price: number): Promise<void> {
+	async addItem(itemId: string, quantity: number, price: number): Promise<void> {
 		await prisma.requestItem.create({
 			data: {
 				requestId: this.id,
@@ -101,7 +106,7 @@ export class Request {
 	}
 
 	// GETTERS
-	getId(): number {
+	getId(): string {
 		return this.id;
 	}
 
@@ -113,7 +118,10 @@ export class Request {
 		return this.status;
 	}
 	getPurpose(): string | null {
-		return this.status;
+		return this.purpose;
+	}
+	getOwnerId(): string {
+		return this.ownerId;
 	}
 
 	// Compute total price dynamically from items
