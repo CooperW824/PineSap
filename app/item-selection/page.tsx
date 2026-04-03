@@ -26,7 +26,8 @@ function BackButton() {
   return (
     <Link
       href="/"
-      className="btn h-12 min-h-12 rounded-2xl border-base-300 bg-base-200 px-5 text-base font-semibold text-base-content shadow-none hover:border-base-300 hover:bg-base-300/60"
+      className="btn h-12 min-h-12 rounded-2xl border-base-300 bg-base-200 px-5 text-base 
+      font-semibold text-base-content shadow-none hover:border-base-300 hover:bg-base-300/60"
     >
       <ArrowLeft className="h-4 w-4" />
       Back to Home
@@ -47,7 +48,7 @@ export default async function ItemSelectionPage({
   const itemId = Array.isArray(resolvedSearchParams.itemId)
     ? resolvedSearchParams.itemId[0]
     : resolvedSearchParams.itemId;
-  const selectedItem = itemId ? getInventoryItemById(itemId) : undefined;
+  const selectedItem = itemId ? await getInventoryItemById(parseInt(itemId)) : undefined;
 
   return (
     <main
@@ -75,11 +76,11 @@ export default async function ItemSelectionPage({
                     Item Details
                   </p>
                   <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
-                    {selectedItem.title}
+                    {selectedItem.name}
                   </h1>
                   <div className="mt-4 flex flex-wrap gap-3">
                     <div className="badge badge-outline badge-lg px-4 py-3 text-sm font-medium">
-                      {selectedItem.location}
+                      {selectedItem.physicalLocation}
                     </div>
                   </div>
                 </div>
@@ -90,29 +91,24 @@ export default async function ItemSelectionPage({
                   <div className="grid gap-6 lg:grid-cols-2">
                     <DetailField
                       label="Description of Item"
-                      value={selectedItem.description}
+                      value={selectedItem.description ?? "No description provided"}
                       className="lg:col-span-2"
                     />
                     <DetailField
                       label="Quantity of Item"
-                      value={String(selectedItem.quantity)}
+                      value={String(selectedItem.stockQuantity)}
                     />
                     <DetailField
-                      label="Place it was Purchased From"
-                      value={selectedItem.purchasedFrom}
-                    />
-                    <DetailField label="Prior Cost" value={selectedItem.priorCost} />
-                    <DetailField
-                      label="Prior Vendor"
-                      value={selectedItem.priorVendor}
+                      label="Place of Purchase"
+                      value={selectedItem.placeOfPurchase ?? "Unknown"}
                     />
                     <DetailField
-                      label="Person Who Requested"
-                      value={selectedItem.requestedBy}
+                      label="Price"
+                      value={`$${selectedItem.price.toFixed(2)}`}
                     />
                     <DetailField
-                      label="Person Who Approved"
-                      value={selectedItem.approvedBy}
+                      label="Location"
+                      value={selectedItem.physicalLocation ?? "Unknown"}
                     />
                   </div>
                 </section>

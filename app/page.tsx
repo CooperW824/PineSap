@@ -1,10 +1,12 @@
 import { Filter, Search } from "lucide-react";
-import { getInventoryItems } from "@/lib/server/inventory/items";
+import { getInventoryItems, getInventoryItemCount } from "@/lib/server/inventory/items";
 
 import Pagination from "./components/pagination";
 
-export default function Home() {
-  const inventoryItems = getInventoryItems();
+// added async so we can await the fetch of inventory items, not sure if this is the best way but It works 
+export default async function Home() {
+  const inventoryItems = await getInventoryItems(1, Number(process.env.NEXT_PUBLIC_ITEMS_PER_PAGE));
+  const count = await getInventoryItemCount();
 
   return (
     <main className="min-h-screen w-full p-6 bg-base-100 text-base-content flex flex-col items-center">
@@ -14,11 +16,12 @@ export default function Home() {
 
       <div className="w-full max-w-4xl space-y-8">
         <section className="flex flex-col gap-2">
-          <label htmlFor="club-select" className="text-sm font-semibold opacity-70 ml-1">
+          <label htmlFor="project-select" className="text-sm font-semibold opacity-70 ml-1">
             Project Name
           </label>
+          {/* FIX PROJECT SELECT FOR BETA RELEASE */}
           <select
-            id="club-select"
+            id="project-select"
             className="select select-bordered w-full max-w-xs bg-base-200"
             defaultValue="Project A"
           >
@@ -46,7 +49,7 @@ export default function Home() {
             </button>
           </div>
 
-          <Pagination items={inventoryItems} />
+          <Pagination items={inventoryItems} count={count} />
         </section>
       </div>
     </main>

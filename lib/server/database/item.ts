@@ -1,51 +1,60 @@
 import { Decimal } from "@prisma/client/runtime/client"
 import prisma from "../prisma" //fixed the import, was wrong
 
-/// Class for items in the DB
+// Class for items in the DB
 export class Item {
+
     // Local variables
+
+    //added createdAt and placeOfPurchase to better match our app/item-selection/page.tsx
     id: number
+    createdAt: Date
     name: string
     price: Decimal
     quantity: number
     description?: string
-    physicalLocation ?: string
+    physicalLocation?: string
+    placeOfPurchase?: string
 
-
-    /// Cosntructor
-    // apparently its illegal to have an asynch contructor, so we can't fetch from DB here?
+    /// Constructor
     protected constructor(data: {
     id: number
+    createdAt: Date
     name: string
     price: Decimal
     quantity: number
     description?: string
     physicalLocation ?: string
+    placeOfPurchase?: string
   }) {
     this.id = data.id
+    this.createdAt = data.createdAt
     this.name = data.name
     this.price = data.price
     this.quantity = data.quantity
     this.description = data.description
     this.physicalLocation = data.physicalLocation
+    this.placeOfPurchase = data.placeOfPurchase
   }
 
     // do we delete this function now? since fromID does basically the same thing. 
     /// Fetch from DB, returns null if the item doesn't exist
     static async fetchByID(itemId: number): Promise<Item | null> {
         const item = await prisma.item.findUnique({
-            where: {id: itemId},
+            where: { id: itemId },
         })
 
         if (!item) return null
 
         return new Item({
             id: item.id,
+            createdAt: item.createdAt,
             name: item.name,
-            price: item.price,
-            quantity: item.stockQuantity,
-            description: item.description ?? undefined, // says this desc may be null
-            physicalLocation: item.physicalLocation ?? undefined, // says this desc may be null
+            price: Number(item.price),
+            quantity: item.stockQuantity, //change to stockQuantity to match scheme.prisma
+            description: item.description ?? undefined,
+            physicalLocation: item.physicalLocation ?? undefined,
+            placeOfPurchase: item.placeOfPurchase ?? undefined,
         })
     }
     
@@ -58,19 +67,25 @@ export class Item {
         },
         })
 
+        // once again just showing I added createdAt and placeOfPurchase
         return new Item({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: Number(item.stockQuantity),
-        description: item.description ?? undefined,
-        physicalLocation: item.physicalLocation ?? undefined,
+            id: item.id,
+            createdAt: item.createdAt,
+            name: item.name,
+            price: Number(item.price), //
+            quantity: item.stockQuantity,
+            description: item.description ?? undefined,
+            physicalLocation: item.physicalLocation ?? undefined,
+            placeOfPurchase: item.placeOfPurchase ?? undefined,
         })
     }
 
     //getters (send local data)
     getId(): number {
         return this.id
+    }
+    getCreatedAt(): Date {
+        return this.createdAt
     }
     getName(): string {
         return this.name
@@ -82,16 +97,16 @@ export class Item {
         return this.quantity
     }
     getDesc(): string | null {
-        if(!this.description){return null}
-        else{
-            return this.description
-        }
+        if (!this.description) { return null }
+        else { return this.description }
     }
     getPhysicalLocation(): string | null {
-        if(!this.physicalLocation){return null}
-        else{
-            return this.physicalLocation
-        }
+        if (!this.physicalLocation) { return null }
+        else { return this.physicalLocation }
+    }
+    getPlaceOfPurchase(): string | null {
+        if (!this.placeOfPurchase) { return null }
+        else { return this.placeOfPurchase }
     }
     
     //setters (update local and DB data)
@@ -111,33 +126,57 @@ export class Item {
     })
     this.price = newPrice
   }
-    async setQuantity(newQuantity: Decimal): Promise<void> {
-    await prisma.item.update({
-      where: { id: this.id },
-      data: { price: newQuantity },
-    })
-    this.price = newQuantity
-  }
+    async setQuantity(newQuantity: number): Promise<void> {
+        await prisma.item.update({
+            where: { id: this.id },
+            data: { stockQuantity: newQuantity },
+        })
+        this.quantity = newQuantity
+    }
     async setDescription(newDescription: string): Promise<void> {
-    // update DB
-    await prisma.item.update({
-      where: { id: this.id },
-      data: { description: newDescription },
-    })
-    // update local object
-    this.description = newDescription
-  }
+        // update DB
+        await prisma.item.update({
+            where: { id: this.id },
+            data: { description: newDescription },
+        })
+        // update local object
+        this.description = newDescription
+    }
+
     async setPhysicalLocation(newPhysicalLocation: string): Promise<void> {
-    // update DB
-    await prisma.item.update({
-      where: { id: this.id },
-      data: { description: newPhysicalLocation },
-    })
-    // update local object
-    this.description = newPhysicalLocation
-  }
+        // update DB
+        await prisma.item.update({
+            where: { id: this.id },
+            data: { physicalLocation: newPhysicalLocation },
+        })
+        // update local object
+        this.physicalLocation = newPhysicalLocation
+    }
 
-  // special functions
+    // special functions
 
+    // -- INVENTORY FUNCTIONS --
+    static async count(): Promise<number> {
+        return prisma.item.count();
+    }
 
+    static async list(page_size: number, page_number: number): Promise<Item[]> {
+        const items = await prisma.item.findMany({
+            take: page_size,
+            skip: (page_number - 1) * page_size,
+            orderBy: { createdAt: "desc" },
+        })
+
+        return items.map(item => new Item({
+            id: item.id,
+            createdAt: item.createdAt,
+            name: item.name,
+            price: Number(item.price),
+            quantity: item.stockQuantity,
+            description: item.description ?? undefined,
+            physicalLocation: item.physicalLocation ?? undefined,
+            placeOfPurchase: item.placeOfPurchase ?? undefined,
+        }))
+    }
 }
+// ---------------------------------
