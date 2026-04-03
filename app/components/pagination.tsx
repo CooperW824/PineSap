@@ -4,25 +4,39 @@ import { useState } from "react";
 import { type InventoryItem } from "@/lib/server/inventory/items";
 
 import ItemBox from "./item-box";
+import PaginationControls from "./pagination-controls";
 
 type PaginationProps = {
   items: InventoryItem[];
+  count: number;
   itemsPerPage?: number;
 };
 
 export default function Pagination({
   items,
+  count,
   itemsPerPage = 10,
 }: PaginationProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [paginatedItems, setPaginatedItems] = useState<InventoryItem[]>(items);
+  const [paginatedCount, setPaginatedCount] = useState<number>(count);
 
-  const totalPages = Math.ceil(items.length / itemsPerPage);
-  const paginatedItems = items.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(paginatedCount / itemsPerPage);
 
-  if (items.length === 0) {
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    fetch(`/api/inventory?page=${newPage}&limit=${itemsPerPage}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPaginatedItems(data.items);
+        setPaginatedCount(data.count);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch inventory for page " + newPage, err);
+      });
+  };
+
+  if (paginatedCount === 0) {
     return (
       <p className="rounded-box border border-base-300 bg-base-200 p-4 text-sm opacity-70">
         No inventory items to display.
@@ -40,27 +54,11 @@ export default function Pagination({
 
       {totalPages > 1 && (
         <div className="flex justify-center mt-8 w-full">
-          <div className="join shadow-sm">
-            <button
-              className="join-item btn"
-              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-              disabled={currentPage === 1}
-            >
-              «
-            </button>
-            <button className="join-item btn no-animation pointer-events-none bg-base-200 hover:bg-base-200">
-              Page {currentPage} of {totalPages}
-            </button>
-            <button
-              className="join-item btn"
-              onClick={() =>
-                setCurrentPage((page) => Math.min(totalPages, page + 1))
-              }
-              disabled={currentPage === totalPages}
-            >
-              »
-            </button>
-          </div>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
     </>
