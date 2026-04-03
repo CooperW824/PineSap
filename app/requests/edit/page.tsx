@@ -2,21 +2,6 @@
 import { Trash2, Pencil } from "lucide-react";
 import { useState } from "react" 
 
-// sample items, delete later
-const sampleItems = [
-  {
-    name: "Rocket Fuel ",
-    description: "Stolen Nasa Rocket Fuel (very strong and dangerous)",
-    price: "980,000",
-    quantity: "45",
-  },
-  {
-    name: "hamburgers",
-    description: "i'm hungry",
-    price: "15.00",
-    quantity: "10",
-  },
-];
 
 export default function CreateRequestPage() {
 

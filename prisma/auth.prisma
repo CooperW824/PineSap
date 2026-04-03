@@ -13,6 +13,8 @@ model User {
     sessions      Session[]
     accounts      Account[]
 
+    Requests Request[]  /// The requests created by the user.
+
     @@unique([email])
     @@map("user")
 }
