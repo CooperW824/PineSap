@@ -42,7 +42,7 @@ export default function RequestsPage() {
                 className="block"
               > {/* need to make the link element behave like a block so we can have proper spacing, may not be neccesary
               when we have non-sample requests.*/}
-                <div className="card bg-base-300 shadow p-8 cursor-pointer hover:shadow-lg">
+                <div className="card border border-transparent bg-base-300 p-8 shadow transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:border-success hover:shadow-lg">
                   
                   <div className="flex justify-between">
                     

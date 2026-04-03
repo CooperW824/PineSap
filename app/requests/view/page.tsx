@@ -1,4 +1,6 @@
 
+import Link from "next/link";
+
 // sample items, delete later
 const sampleItems = [
   {
@@ -68,25 +70,15 @@ export default function ViewRequestPage() {
 
         </div>
 
-        {/* sensibily sized buttons 
-        <div className="flex gap-10">
-          <button className="btn btn-success">
-            Approve
-          </button>
-
-          <button className="btn btn-error">
-            Deny
-          </button>
-        </div>
-            */}
-
-      {/* comicall large buttons */}
-      <div className="flex gap-4 mt-6">
-        <button className="btn btn-success w-1/2 h-32 text-xl">
+      <div className="flex gap-3 mt-6">
+        <Link href="/requests" className="btn btn-outline">
+          Cancel
+        </Link>
+        <button className="btn btn-success">
           Approve
         </button>
 
-        <button className="btn btn-error w-1/2 h-32 text-xl">
+        <button className="btn btn-error">
           Deny
         </button>
       </div>

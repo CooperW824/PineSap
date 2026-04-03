@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Trash2, Pencil } from "lucide-react";
 
 // sample items, delete later
@@ -84,8 +85,12 @@ export default function CreateRequestPage() {
           </div>
         </div>
 
-        {/* SUBMIT BUTTON */}
-        <button className="btn btn-primary">Submit Request</button>
+        <div className="flex gap-3">
+          <Link href="/requests" className="btn btn-outline">
+            Cancel
+          </Link>
+          <button className="btn btn-primary">Submit Request</button>
+        </div>
       </div>
     </main>
   );
