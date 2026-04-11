@@ -1,6 +1,6 @@
 "use client";
 
-import { ItemData } from "@/lib/server/database/request";
+import { ItemData } from "@/lib/server/DatabaseModels/request";
 import { useEffect, useState } from "react";
 import PaginationControls from "../../pagination-controls";
 import ItemCard from "./item-card";

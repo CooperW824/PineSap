@@ -1,7 +1,7 @@
 import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
-import { Request as PersistedRequest } from "@/lib/server/database/request";
+import { Request as PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { headers } from "next/headers";
 
 export async function POST(request: Request) {

@@ -4,7 +4,7 @@ of an item. this file is where app/page.tsx and item-selection/page.tsx both pul
 information from. This being here serves to make it easier to refactor for database
 calls later.
 */
-import { Item } from "../database/item";
+import { Item } from "../DatabaseModels/item";
 
 export type InventoryItem = {
 	id: string;

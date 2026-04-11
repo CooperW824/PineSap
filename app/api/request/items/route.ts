@@ -1,8 +1,8 @@
 import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
-import { Request as PersistedRequest } from "@/lib/server/database/request";
-import { Item as PersistedItem } from "@/lib/server/database/item";
+import { Request as PersistedRequest } from "@/lib/server/DatabaseModels/request";
+import { Item as PersistedItem } from "@/lib/server/DatabaseModels/item";
 import { headers } from "next/headers";
 
 export async function GET(request: Request) {

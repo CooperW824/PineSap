@@ -4,7 +4,7 @@ import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Request as PersistedRequest } from "@/lib/server/database/request";
+import { Request as PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import RequestNameEdit from "@/app/components/Requests/name-edit";
 import RequestDecriptionEdit from "@/app/components/Requests/description-edit";
 import RequestSubmitButton from "@/app/components/Requests/submit-request-button";
@@ -53,11 +53,10 @@ export default async function EditRequestPage(params: { searchParams: Promise<{ 
 				<RequestNameEdit requestId={requestId} name={request.getName()} />
 
 				<RequestDecriptionEdit requestId={requestId} description={request.getPurpose() || ""} />
-        
+
 				<RequestItemsList requestId={requestId} items={items} totalItemCount={totalItems} />
 
 				<RequestSubmitButton requestId={requestId} />
-
 			</div>
 		</main>
 	);

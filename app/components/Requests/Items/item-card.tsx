@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { ItemData } from "@/lib/server/database/request";
+import { ItemData } from "@/lib/server/DatabaseModels/request";
 
 export default function ItemCard({ item, requestId }: { item: ItemData; requestId: string }) {
 	const [error, setError] = useState<string | null>(null);
