@@ -112,6 +112,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		price,
 		quantity,
 		description,
+		placeOfPurchase,
 	}: Omit<ItemData, "id" | "physicalLocation">): Promise<ItemData> {
 		const item = await prisma.item.create({
 			data: {
@@ -119,6 +120,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 				price,
 				description,
 				stockQuantity: quantity,
+				placeOfPurchase,
 			},
 		});
 
