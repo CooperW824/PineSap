@@ -9,6 +9,7 @@ export type RequestData = {
 	purpose: string | null;
 	status: RequestStatus;
 	ownerId: string;
+	totalCost: number;
 };
 
 interface Request {
@@ -17,10 +18,13 @@ interface Request {
 	get purpose(): string | null;
 	get status(): RequestStatus;
 	get ownerId(): string;
+	get totalCost(): number;
+
 	getItems(pageNumber: number, itemsPerPage: number): Promise<ItemData[]>;
 	countItems(): Promise<number>;
 	addItem(data: ItemData): Promise<ItemData>;
-	getTotalRequestPrice(): Promise<number>;
+	removeItem(itemId: string): Promise<void>;
+
 	set name(newName: string);
 	set purpose(newPurpose: string | null);
 	set status(newStatus: RequestStatus);
@@ -31,6 +35,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 	private m_purpose: string | null;
 	private m_status: RequestStatus;
 	private m_ownerId: string;
+	private m_totalCost: number;
 
 	/// PRIVATE constructor
 	private constructor(data: RequestData) {
@@ -39,6 +44,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		this.m_purpose = data.purpose;
 		this.m_status = data.status;
 		this.m_ownerId = data.ownerId;
+		this.m_totalCost = data.totalCost;
 	}
 
 	static async getById(requestId: string): Promise<PersistedRequest | null> {
@@ -54,6 +60,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			purpose: request.purpose,
 			status: request.status,
 			ownerId: request.ownerId,
+			totalCost: request.totalCost,
 		});
 	}
 
@@ -73,6 +80,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			purpose: request.purpose,
 			status: request.status,
 			ownerId: request.ownerId,
+			totalCost: request.totalCost,
 		});
 	}
 
@@ -132,8 +140,13 @@ export class PersistedRequest extends DatabaseObject implements Request {
 						id: item.id,
 					},
 				},
+				totalCost: {
+					increment: price * quantity,
+				},
 			},
 		});
+
+		this.m_totalCost += price * quantity;
 
 		return {
 			id: item.id,
@@ -145,19 +158,36 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		};
 	}
 
-	// Compute total price dynamically from items
-	async getTotalRequestPrice(): Promise<number> {
-		const items = await prisma.item.findMany({
-			where: {
-				requestId: this.id,
-			},
-			select: {
-				price: true,
-				stockQuantity: true,
+	async removeItem(itemId: string): Promise<void> {
+		const item = await prisma.item.findUnique({
+			where: { id: itemId },
+		});
+
+		if (!item) {
+			throw new Error("Item not found");
+		}
+
+		await prisma.request.update({
+			where: { id: this.id },
+			data: {
+				requestItems: {
+					disconnect: {
+						id: itemId,
+					},
+				},
+				totalCost: {
+					decrement: item.price * item.stockQuantity,
+				},
 			},
 		});
 
-		return items.reduce((total, item) => total + item.price * item.stockQuantity, 0);
+		this.m_totalCost -= item.price * item.stockQuantity;
+
+		await prisma.item.delete({
+			where: {
+				id: itemId,
+			},
+		});
 	}
 
 	get id(): string {
@@ -178,6 +208,10 @@ export class PersistedRequest extends DatabaseObject implements Request {
 
 	get ownerId(): string {
 		return this.m_ownerId;
+	}
+
+	get totalCost(): number {
+		return this.m_totalCost;
 	}
 
 	set name(newName: string) {
@@ -226,6 +260,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			purpose: request.purpose,
 			status: request.status,
 			ownerId: request.ownerId,
+			totalCost: request.totalCost,
 		}));
 	}
 }

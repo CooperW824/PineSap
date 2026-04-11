@@ -46,6 +46,7 @@ model Request {
   purpose      String?       @db.VarChar(300) /// The reason why the items in the request are needed.
   requestItems Item[] /// The items that are in the request.
   status       RequestStatus @default(NOT_SUBMITTED) /// Can be 'Pending', 'Denied', or 'Approved'.
+  totalCost    Float         @default(0) /// The total cost of the request, calculated as the sum of the cost of all items in the request.
 
   ownerId String /// The id of the user who created the request.
   owner   User   @relation(name: "authoredRequests", fields: [ownerId], references: [id]) /// The user who created the request.
