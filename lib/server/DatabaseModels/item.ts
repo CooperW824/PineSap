@@ -1,6 +1,15 @@
 import { Decimal } from "@prisma/client/runtime/client";
 import prisma from "../prisma"; //fixed the import, was wrong
 
+export type ItemData = {
+	id: string;
+	name: string;
+	price: number;
+	quantity: number;
+	description?: string | null;
+	physicalLocation?: string | null;
+};
+
 // Class for items in the DB
 export class Item {
 	// Local variables

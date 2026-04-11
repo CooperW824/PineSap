@@ -1,49 +1,54 @@
 import prisma from "../prisma"; //fixed the import, was wrong
-import { Item } from "./item";
+import { DatabaseObject } from "./database-object";
+import { ItemData } from "./item";
 import { RequestStatus } from "@/generated/prisma/client";
 
-//item definetion got getItems
-// not sure if this is what you mean cooper
-export type ItemData = {
+export type RequestData = {
 	id: string;
 	name: string;
-	price: number;
-	quantity: number;
-	description?: string | null;
-	physicalLocation?: string | null;
+	purpose: string | null;
+	status: RequestStatus;
+	ownerId: string;
 };
 
-export class Request {
-	private id: string;
-	private name: string;
-	private purpose: string | null;
-	private status: RequestStatus;
-	private ownerId: string;
+interface Request {
+	get id(): string;
+	get name(): string;
+	get purpose(): string | null;
+	get status(): RequestStatus;
+	get ownerId(): string;
+	getItems(pageNumber: number, itemsPerPage: number): Promise<ItemData[]>;
+	countItems(): Promise<number>;
+	addItem(data: ItemData): Promise<ItemData>;
+	getTotalRequestPrice(): Promise<number>;
+	set name(newName: string);
+	set purpose(newPurpose: string | null);
+	set status(newStatus: RequestStatus);
+}
+
+export class PersistedRequest extends DatabaseObject implements Request {
+	private m_name: string;
+	private m_purpose: string | null;
+	private m_status: RequestStatus;
+	private m_ownerId: string;
 
 	/// PRIVATE constructor
-	private constructor(data: {
-		id: string;
-		name: string;
-		status: RequestStatus;
-		purpose: string | null;
-		ownerId: string;
-	}) {
-		this.id = data.id;
-		this.name = data.name;
-		this.purpose = data.purpose;
-		this.status = data.status;
-		this.ownerId = data.ownerId;
+	private constructor(data: RequestData) {
+		super(data.id);
+		this.m_name = data.name;
+		this.m_purpose = data.purpose;
+		this.m_status = data.status;
+		this.m_ownerId = data.ownerId;
 	}
 
-	/// Fetch from DB by ID
-	static async fromId(requestId: string): Promise<Request | null> {
+	static async getById(requestId: string): Promise<PersistedRequest | null> {
 		const request = await prisma.request.findUnique({
 			where: { id: requestId },
 		});
 
 		if (!request) return null;
 
-		return new Request({
+		return new PersistedRequest({
 			id: request.id,
 			name: request.name,
 			purpose: request.purpose,
@@ -53,7 +58,7 @@ export class Request {
 	}
 
 	/// Create EMPTY request
-	static async create(ownerId: string): Promise<Request> {
+	static async create(ownerId: string): Promise<PersistedRequest> {
 		const request = await prisma.request.create({
 			data: {
 				name: "", // placeholder
@@ -62,7 +67,7 @@ export class Request {
 			},
 		});
 
-		return new Request({
+		return new PersistedRequest({
 			id: request.id,
 			name: request.name,
 			purpose: request.purpose,
@@ -73,131 +78,152 @@ export class Request {
 
 	/// Get all items in this request
 	async getItems(pageNumber: number, itemsPerPage: number): Promise<ItemData[]> {
-		const requestItems = await prisma.requestItem.findMany({
-			where: { requestId: this.id },
-			include: {
-				item: true,
+		const items = await prisma.item.findMany({
+			where: {
+				requestId: this.id,
 			},
-			take: itemsPerPage,
 			skip: (pageNumber - 1) * itemsPerPage,
+			take: itemsPerPage,
 		});
 
-		return requestItems.map(
-			(ri: (typeof requestItems)[number]): ItemData => ({
-				id: ri.item.id,
-				name: ri.item.name,
-				price: Number(ri.item.price),
-				quantity: ri.quantity,
-				description: ri.item.description,
-				physicalLocation: ri.item.physicalLocation,
-			}),
-		);
+		return items.map((item) => ({
+			id: item.id,
+			name: item.name,
+			price: item.price,
+			quantity: item.stockQuantity,
+			description: item.description,
+			physicalLocation: item.physicalLocation,
+		}));
 	}
 
 	async countItems(): Promise<number> {
-		return prisma.requestItem.count({
-			where: { requestId: this.id },
+		const count = await prisma.item.count({
+			where: {
+				requestId: this.id,
+			},
 		});
+		return count;
 	}
 
 	// should this instead take in an item object and quantity?
 	/// Add item to request
-	async addItem(
-		name: string,
-		price: number,
-		quantity: number,
-		description: string | null,
-	): Promise<ItemData> {
+	async addItem({
+		name,
+		price,
+		quantity,
+		description,
+	}: Omit<ItemData, "id" | "physicalLocation">): Promise<ItemData> {
 		const item = await prisma.item.create({
 			data: {
 				name,
 				price,
-				stockQuantity: quantity,
 				description,
+				stockQuantity: quantity,
 			},
 		});
 
-		const requestItem = await prisma.requestItem.create({
+		await prisma.request.update({
+			where: { id: this.id },
 			data: {
-				requestId: this.id,
-				itemId: item.id,
-				quantity,
-				price,
+				requestItems: {
+					connect: {
+						id: item.id,
+					},
+				},
 			},
 		});
 
 		return {
 			id: item.id,
 			name: item.name,
-			price: Number(item.price),
-			quantity: requestItem.quantity,
+			price: item.price,
+			quantity: item.stockQuantity,
 			description: item.description,
 			physicalLocation: item.physicalLocation,
 		};
 	}
 
-	// GETTERS
-	getId(): string {
-		return this.id;
-	}
-
-	getName(): string {
-		return this.name;
-	}
-
-	getStatus(): string {
-		return this.status;
-	}
-	getPurpose(): string | null {
-		return this.purpose;
-	}
-	getOwnerId(): string {
-		return this.ownerId;
-	}
-
 	// Compute total price dynamically from items
 	async getTotalRequestPrice(): Promise<number> {
-		const items = await prisma.requestItem.findMany({
-			where: { requestId: this.id },
-			include: {
-				item: true,
+		const items = await prisma.item.findMany({
+			where: {
+				requestId: this.id,
+			},
+			select: {
+				price: true,
+				stockQuantity: true,
 			},
 		});
-		return items.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
+
+		return items.reduce((total, item) => total + item.price * item.stockQuantity, 0);
 	}
 
-	// SETTERS
-	async setName(newName: string): Promise<void> {
+	get id(): string {
+		return this.object_id;
+	}
+
+	get name(): string {
+		return this.m_name;
+	}
+
+	get purpose(): string | null {
+		return this.m_purpose;
+	}
+
+	get status(): RequestStatus {
+		return this.m_status;
+	}
+
+	get ownerId(): string {
+		return this.m_ownerId;
+	}
+
+	set name(newName: string) {
+		this.m_name = newName;
+	}
+
+	set purpose(newPurpose: string | null) {
+		this.m_purpose = newPurpose;
+	}
+
+	set status(newStatus: RequestStatus) {
+		this.m_status = newStatus;
+	}
+
+	async save(): Promise<void> {
 		await prisma.request.update({
 			where: { id: this.id },
-			data: { name: newName },
+			data: {
+				name: this.m_name,
+				purpose: this.m_purpose,
+				status: this.m_status,
+			},
 		});
-		this.name = newName;
 	}
 
-	// didn't have this before, woops
-	async setPurpose(newPurpose: string): Promise<void> {
-		await prisma.request.update({
+	async delete(): Promise<void> {
+		await prisma.request.delete({
 			where: { id: this.id },
-			data: { purpose: newPurpose },
 		});
-		this.purpose = newPurpose;
 	}
 
-	async setStatus(newStatus: RequestStatus): Promise<void> {
-		await prisma.request.update({
-			where: { id: this.id },
-			data: { status: newStatus },
+	async count(): Promise<number> {
+		const count = await prisma.request.count();
+		return count;
+	}
+
+	static async list(pageSize: number, pageNumber: number): Promise<RequestData[]> {
+		const requests = await prisma.request.findMany({
+			skip: (pageNumber - 1) * pageSize,
+			take: pageSize,
 		});
-		this.status = newStatus;
-	}
 
-	// other methods
-	async approve(): Promise<void> {
-		await this.setStatus(RequestStatus.APPROVED);
-	}
-
-	async deny(): Promise<void> {
-		await this.setStatus(RequestStatus.DENIED);
+		return requests.map((request) => ({
+			id: request.id,
+			name: request.name,
+			purpose: request.purpose,
+			status: request.status,
+			ownerId: request.ownerId,
+		}));
 	}
 }

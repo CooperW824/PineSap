@@ -5,229 +5,221 @@ import { auth } from "../auth";
 import { headers } from "next/headers";
 
 export interface User {
-  get id(): string;
-  get name(): string;
-  get email(): string;
-  get role(): Role;
-  set name(name: string);
-  set email(email: string);
-  set role(role: Role);
+	get id(): string;
+	get name(): string;
+	get email(): string;
+	get role(): Role;
+	set name(name: string);
+	set email(email: string);
+	set role(role: Role);
 }
 
 export type UserData = {
-  id: string;
-  name: string;
-  email: string;
-  role: Role;
+	id: string;
+	name: string;
+	email: string;
+	role: Role;
 };
-
-function randomPassword(length: number): string {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
 
 /** User implementation that persists to the database. This would be a wrapper around the Prisma User model, and would implement the User interface.
  */
 export class PersistedUser extends DatabaseObject implements User {
-  private m_name: string;
-  private m_email: string;
-  private m_role: Role;
+	private m_name: string;
+	private m_email: string;
+	private m_role: Role;
 
-  protected constructor(data: UserData) {
-    super(data.id);
-    // Fetch the user from the database using the id, and populate the fields of the object.
-    // Throw an error if the user is not found.
+	protected constructor(data: UserData) {
+		super(data.id);
+		// Fetch the user from the database using the id, and populate the fields of the object.
+		// Throw an error if the user is not found.
 
-    // Initialize fields to default values while the database query is in progress.
-    this.m_name = data.name;
-    this.m_email = data.email;
-    this.m_role = data.role;
-  }
+		// Initialize fields to default values while the database query is in progress.
+		this.m_name = data.name;
+		this.m_email = data.email;
+		this.m_role = data.role;
+	}
 
-  static async getById(id: string): Promise<PersistedUser | null> {
-    const userData = await prisma.user.findUnique({
-      where: { id },
-      select: { id: true, name: true, email: true, role: true },
-    });
+	static async getById(id: string): Promise<PersistedUser | null> {
+		const userData = await prisma.user.findUnique({
+			where: { id },
+			select: { id: true, name: true, email: true, role: true },
+		});
 
-    if (!userData) {
-      return null;
-    }
+		if (!userData) {
+			return null;
+		}
 
-    return new PersistedUser(userData);
-  }
+		return new PersistedUser(userData);
+	}
 
-  static async getByEmail(email: string): Promise<PersistedUser | null> {
-    const userData = await prisma.user.findUnique({
-      where: { email },
-      select: { id: true, name: true, email: true, role: true },
-    });
+	static async getByEmail(email: string): Promise<PersistedUser | null> {
+		const userData = await prisma.user.findUnique({
+			where: { email },
+			select: { id: true, name: true, email: true, role: true },
+		});
 
-    if (!userData) {
-      return null;
-    }
+		if (!userData) {
+			return null;
+		}
 
-    return new PersistedUser(userData);
-  }
+		return new PersistedUser(userData);
+	}
 
-  static async create(data: {
-    name: string;
-    email: string;
-    role?: Role;
-  }): Promise<PersistedUser> {
-    // Creates a new user in the database using BetterAuth
-    const resp = await auth.api.createUser({
-      body: {
-        name: data.name,
-        email: data.email,
-        password: randomPassword(12), // Generate a random password since the user will set their own password through the forgot password flow.
-      },
-    });
+	private static randomPassword(length: number): string {
+		const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+		let password = "";
+		for (let i = 0; i < length; i++) {
+			password += chars.charAt(Math.floor(Math.random() * chars.length));
+		}
+		return password;
+	}
 
-    const resetResp = await auth.api.requestPasswordReset({
-      body: {
-        email: data.email,
-        redirectTo: `${process.env.BETTER_AUTH_URL}/reset-password`,
-      },
-    });
+	static async create(data: { name: string; email: string; role?: Role }): Promise<PersistedUser> {
+		// Creates a new user in the database using BetterAuth
+		const resp = await auth.api.createUser({
+			body: {
+				name: data.name,
+				email: data.email,
+				password: this.randomPassword(12), // Generate a random password since the user will set their own password through the forgot password flow.
+			},
+		});
 
-    if (resetResp.status === false) {
-      throw new Error("Failed to request password reset: " + resetResp.message);
-    }
+		const resetResp = await auth.api.requestPasswordReset({
+			body: {
+				email: data.email,
+				redirectTo: `${process.env.BETTER_AUTH_URL}/reset-password`,
+			},
+		});
 
-    // Update the user's role if it's provided (the default is "external")
-    if (data.role && data.role !== "external") {
-      await prisma.user.update({
-        where: { id: resp.user.id },
-        data: { role: data.role },
-      });
-    }
+		if (resetResp.status === false) {
+			throw new Error("Failed to request password reset: " + resetResp.message);
+		}
 
-    return new PersistedUser({
-      email: resp.user.email,
-      id: resp.user.id,
-      name: data.name,
-      role: data.role || "external",
-    });
-  }
+		// Update the user's role if it's provided (the default is "external")
+		if (data.role && data.role !== "external") {
+			await prisma.user.update({
+				where: { id: resp.user.id },
+				data: { role: data.role },
+			});
+		}
 
-  async delete(): Promise<void> {
-    const resp = await auth.api.removeUser({
-      body: { userId: this.id },
-      headers: await headers(),
-      // We can get the headers from the orignal request context since this method would be called from the API route handlers where we have access to the request headers,
-      //  which include the authentication token.
-    });
-    if (!resp.success) {
-      throw new Error("Failed to delete user: ");
-    }
+		return new PersistedUser({
+			email: resp.user.email,
+			id: resp.user.id,
+			name: data.name,
+			role: data.role || "external",
+		});
+	}
 
-    return Promise.resolve();
-  }
+	async delete(): Promise<void> {
+		const resp = await auth.api.removeUser({
+			body: { userId: this.id },
+			headers: await headers(),
+			// We can get the headers from the orignal request context since this method would be called from the API route handlers where we have access to the request headers,
+			//  which include the authentication token.
+		});
+		if (!resp.success) {
+			throw new Error("Failed to delete user: ");
+		}
 
-  static async count(): Promise<number> {
-    const resp = await prisma.user.count();
-    return resp;
-  }
+		return Promise.resolve();
+	}
 
-  static async list(
-    page_size: number,
-    page_number: number,
-  ): Promise<UserData[]> {
-    // Return a paginated list of objects from the database.
-    const resp = await prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true },
-      take: page_size,
-      skip: (page_number - 1) * page_size,
-      orderBy: { createdAt: "desc" },
-    });
-    return resp;
-  }
+	static async count(): Promise<number> {
+		const resp = await prisma.user.count();
+		return resp;
+	}
 
-  async save(): Promise<void> {
-    // Save the current state of the object to the database.
-    return prisma.user
-      .update({
-        where: { id: this.id },
-        data: {
-          name: this.name,
-          email: this.email,
-          role: this.role,
-        },
-      })
-      .then(() => Promise.resolve())
-      .catch((err) => Promise.reject(err));
-  }
+	static async list(page_size: number, page_number: number): Promise<UserData[]> {
+		// Return a paginated list of objects from the database.
+		const resp = await prisma.user.findMany({
+			select: { id: true, name: true, email: true, role: true },
+			take: page_size,
+			skip: (page_number - 1) * page_size,
+			orderBy: { createdAt: "desc" },
+		});
+		return resp;
+	}
 
-  get name(): string {
-    return this.m_name;
-  }
+	async save(): Promise<void> {
+		// Save the current state of the object to the database.
+		return prisma.user
+			.update({
+				where: { id: this.id },
+				data: {
+					name: this.name,
+					email: this.email,
+					role: this.role,
+				},
+			})
+			.then(() => Promise.resolve())
+			.catch((err) => Promise.reject(err));
+	}
 
-  set name(name: string) {
-    this.m_name = name;
-  }
+	get name(): string {
+		return this.m_name;
+	}
 
-  get email(): string {
-    return this.m_email;
-  }
+	set name(name: string) {
+		this.m_name = name;
+	}
 
-  set email(email: string) {
-    this.m_email = email;
-  }
+	get email(): string {
+		return this.m_email;
+	}
 
-  get role(): Role {
-    return this.m_role;
-  }
+	set email(email: string) {
+		this.m_email = email;
+	}
 
-  set role(role: Role) {
-    this.m_role = role;
-  }
+	get role(): Role {
+		return this.m_role;
+	}
+
+	set role(role: Role) {
+		this.m_role = role;
+	}
 }
 
 // A mock user implementation for testing purposes. This would not persist to the database, and would just be used for testing the authorization logic.
 export class MockUser implements User {
-  private m_id: string;
-  private m_name: string;
-  private m_email: string;
-  private m_role: Role;
+	private m_id: string;
+	private m_name: string;
+	private m_email: string;
+	private m_role: Role;
 
-  constructor(id: string, name: string, email: string, role: Role) {
-    this.m_id = id;
-    this.m_name = name;
-    this.m_email = email;
-    this.m_role = role;
-  }
+	constructor(id: string, name: string, email: string, role: Role) {
+		this.m_id = id;
+		this.m_name = name;
+		this.m_email = email;
+		this.m_role = role;
+	}
 
-  get id(): string {
-    return this.m_id;
-  }
+	get id(): string {
+		return this.m_id;
+	}
 
-  get name(): string {
-    return this.m_name;
-  }
+	get name(): string {
+		return this.m_name;
+	}
 
-  get email(): string {
-    return this.m_email;
-  }
+	get email(): string {
+		return this.m_email;
+	}
 
-  get role(): Role {
-    return this.m_role;
-  }
+	get role(): Role {
+		return this.m_role;
+	}
 
-  set name(name: string) {
-    this.m_name = name;
-  }
+	set name(name: string) {
+		this.m_name = name;
+	}
 
-  set email(email: string) {
-    this.m_email = email;
-  }
+	set email(email: string) {
+		this.m_email = email;
+	}
 
-  set role(role: Role) {
-    this.m_role = role;
-  }
+	set role(role: Role) {
+		this.m_role = role;
+	}
 }
