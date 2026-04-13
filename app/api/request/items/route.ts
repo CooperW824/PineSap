@@ -162,7 +162,6 @@ export async function PATCH(request: Request) {
 		});
 	}
 
-	console.log("Updating item with data:", itemData);
 
 	if (itemData.name) {
 		item.name = itemData.name;

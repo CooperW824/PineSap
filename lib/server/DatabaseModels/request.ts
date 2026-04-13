@@ -250,7 +250,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		});
 	}
 
-	async count(): Promise<number> {
+	static async count(): Promise<number> {
 		const count = await prisma.request.count();
 		return count;
 	}
@@ -259,6 +259,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		const requests = await prisma.request.findMany({
 			skip: (pageNumber - 1) * pageSize,
 			take: pageSize,
+			orderBy: { createdAt: "desc" },
 		});
 
 		return requests.map((request) => ({

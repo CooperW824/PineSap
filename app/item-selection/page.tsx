@@ -47,7 +47,6 @@ export default async function ItemSelectionPage({ searchParams }: ItemSelectionP
 		: resolvedSearchParams.itemId;
 	const selectedItem = itemId ? await PersistedItem.getById(itemId) : undefined;
 
-	console.log("Selected item:", selectedItem);
 
 	return (
 		<main

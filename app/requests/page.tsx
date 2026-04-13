@@ -8,6 +8,7 @@ import { Authorizer } from "@/lib/server/authorization/authorization";
 import { redirect } from "next/navigation";
 import CreateRequestButton from "../components/Requests/create-request-button";
 import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
+import RequestsList from "../components/Requests/requests-list";
 
 export default async function RequestsPage() {
 	const session = await auth.api.getSession({ headers: await headers() });
@@ -26,6 +27,7 @@ export default async function RequestsPage() {
 	}
 
 	const requests = await PersistedRequest.list(10, 1);
+	const totalRequestCount = await PersistedRequest.count();
 
 	return (
 		<main className="p-6 flex flex-col w-full justify-start items-center">
@@ -33,25 +35,7 @@ export default async function RequestsPage() {
 				<h1 className="text-3xl font-bold">Requests</h1>
 				{canSubmit && <CreateRequestButton />}
 			</div>
-			<div className="space-y-3 w-3/4">
-				{requests.map((request) => (
-					<Link key={request.id} href="/requests/view" className="block">
-						<div className="card bg-base-200 shadow p-8 cursor-pointer hover:shadow-lg hover:bg-base-300 transition-colors">
-							<div className="flex justify-between">
-								<div>
-									<p className="font-bold">Name: {request.name || "Untitled Request"}</p>
-									<p>Status: {request.status}</p>
-									<p>Purpose: {request.purpose || "No purpose provided"}</p>
-								</div>
-
-								<div className="text-right">
-									<p>Price: ${request.totalCost.toFixed(2)}</p>
-								</div>
-							</div>
-						</div>
-					</Link>
-				))}
-			</div>
+			<RequestsList requests={requests} totalCount={totalRequestCount} />
 		</main>
 	);
 }
