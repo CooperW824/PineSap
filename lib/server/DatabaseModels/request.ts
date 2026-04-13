@@ -24,6 +24,8 @@ interface Request {
 	countItems(): Promise<number>;
 	addItem(data: ItemData): Promise<ItemData>;
 	removeItem(itemId: string): Promise<void>;
+	approve(): Promise<void>;
+	deny(): Promise<void>;
 
 	set name(newName: string);
 	set purpose(newPurpose: string | null);
@@ -267,5 +269,31 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			ownerId: request.ownerId,
 			totalCost: request.totalCost,
 		}));
+	}
+
+	async approve(): Promise<void> {
+		this.status = "APPROVED";
+		await prisma.item.updateMany({
+			where: {
+				requestId: this.id,
+			},
+			data: {
+				status: "AWAITING_PURCHASE",
+			},
+		});
+		await this.save();
+	}
+
+	async deny(): Promise<void> {
+		this.status = "DENIED";
+		await prisma.item.updateMany({
+			where: {
+				requestId: this.id,
+			},
+			data: {
+				status: "DENIED",
+			},
+		});
+		await this.save();
 	}
 }

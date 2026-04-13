@@ -28,15 +28,15 @@ export default async function RequestsPage() {
 	const requests = await PersistedRequest.list(10, 1);
 
 	return (
-		<main className="p-6">
-			<div className="flex justify-between items-center mb-4">
+		<main className="p-6 flex flex-col w-full justify-start items-center">
+			<div className="flex justify-between items-center mb-4 w-3/4">
 				<h1 className="text-3xl font-bold">Requests</h1>
 				{canSubmit && <CreateRequestButton />}
 			</div>
-			<div className="space-y-3">
+			<div className="space-y-3 w-3/4">
 				{requests.map((request) => (
 					<Link key={request.id} href="/requests/view" className="block">
-						<div className="card bg-base-300 shadow p-8 cursor-pointer hover:shadow-lg">
+						<div className="card bg-base-200 shadow p-8 cursor-pointer hover:shadow-lg hover:bg-base-300 transition-colors">
 							<div className="flex justify-between">
 								<div>
 									<p className="font-bold">Name: {request.name || "Untitled Request"}</p>
