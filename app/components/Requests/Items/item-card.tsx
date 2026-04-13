@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { ItemData } from "@/lib/server/DatabaseModels/request";
+import { ItemData } from "@/lib/server/DatabaseModels/item";
 
 export default function ItemCard({ item, requestId }: { item: ItemData; requestId: string }) {
 	const [error, setError] = useState<string | null>(null);
@@ -42,6 +42,20 @@ export default function ItemCard({ item, requestId }: { item: ItemData; requestI
 							onBlur={updateItem}
 							className="textarea textarea-bordered w-full mt-2"
 						/>
+						<label className="block text-sm font-medium mt-2">Vendor</label>
+						<select
+							value={editedItem.placeOfPurchase || ""}
+							onChange={(e) => setEditedItem({ ...editedItem, placeOfPurchase: e.target.value })}
+							onBlur={updateItem}
+							className="select select-bordered w-full mt-2"
+						>
+							<option value="">Select a vendor</option>
+							<option value="Amazon">Amazon</option>
+							<option value="McMaster Carr">McMaster Carr</option>
+							<option value="Digi-Key">Digi-Key</option>
+							<option value="Grainger">Grainger</option>
+							<option value="Other">Other</option>
+						</select>
 					</div>
 
 					<div className="w-1/3 flex flex-col items-end">
