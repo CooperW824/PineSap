@@ -226,6 +226,10 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		this.m_status = newStatus;
 	}
 
+	set totalCost(newTotalCost: number) {
+		this.m_totalCost = newTotalCost;
+	}
+
 	async save(): Promise<void> {
 		await prisma.request.update({
 			where: { id: this.id },
@@ -233,6 +237,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 				name: this.m_name,
 				purpose: this.m_purpose,
 				status: this.m_status,
+				totalCost: this.m_totalCost,
 			},
 		});
 	}

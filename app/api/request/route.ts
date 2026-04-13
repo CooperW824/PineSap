@@ -1,7 +1,7 @@
 import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
-import { Request as PersistedRequest } from "@/lib/server/DatabaseModels/request";
+import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { headers } from "next/headers";
 
 export async function POST(request: Request) {
@@ -28,10 +28,10 @@ export async function POST(request: Request) {
 	return new Response(
 		JSON.stringify({
 			request: {
-				id: newRequest.getId(),
-				name: newRequest.getName(),
-				purpose: newRequest.getPurpose(),
-				status: newRequest.getStatus(),
+				id: newRequest.id,
+				name: newRequest.name,
+				purpose: newRequest.purpose,
+				status: newRequest.status,
 			},
 		}),
 		{ status: 201 },
@@ -57,7 +57,7 @@ export async function PATCH(request: Request) {
 		});
 	}
 
-	const existingRequest = await PersistedRequest.fromId(requestId);
+	const existingRequest = await PersistedRequest.getById(requestId);
 
 	if (!existingRequest) {
 		return new Response(JSON.stringify({ error: "Request not found" }), {
@@ -66,7 +66,7 @@ export async function PATCH(request: Request) {
 	}
 
 	const requestOwner = await PersistedUser.getById(
-		(await PersistedRequest.fromId(requestId))?.getOwnerId() || "",
+		(await PersistedRequest.getById(requestId))?.ownerId || "",
 	);
 
 	if (!authorizer.requests().canEdit(requestOwner!)) {
@@ -78,24 +78,26 @@ export async function PATCH(request: Request) {
 	const requestData = await request.json();
 
 	if (requestData.name) {
-		await existingRequest.setName(requestData.name);
+		existingRequest.name = requestData.name;
 	}
 
 	if (requestData.purpose) {
-		await existingRequest.setPurpose(requestData.purpose);
+		existingRequest.purpose = requestData.purpose;
 	}
 
 	if (requestData.status) {
-		await existingRequest.setStatus(requestData.status);
+		existingRequest.status = requestData.status;
 	}
+
+	await existingRequest.save();
 
 	return new Response(
 		JSON.stringify({
 			request: {
-				id: existingRequest.getId(),
-				name: existingRequest.getName(),
-				purpose: existingRequest.getPurpose(),
-				status: existingRequest.getStatus(),
+				id: existingRequest.id,
+				name: existingRequest.name,
+				purpose: existingRequest.purpose,
+				status: existingRequest.status,
 			},
 		}),
 		{ status: 200 },

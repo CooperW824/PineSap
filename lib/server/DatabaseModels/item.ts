@@ -56,7 +56,7 @@ export class PersistedItem extends DatabaseObject {
 
 	// do we delete this function now? since fromID does basically the same thing.
 	/// Fetch from DB, returns null if the item doesn't exist
-	static async getByID(itemId: string): Promise<PersistedItem | null> {
+	static async getById(itemId: string): Promise<PersistedItem | null> {
 		const item = await prisma.item.findUnique({
 			where: { id: itemId },
 		});
