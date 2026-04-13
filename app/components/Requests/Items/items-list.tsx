@@ -1,6 +1,6 @@
 "use client";
 
-import { ItemData } from "@/lib/server/DatabaseModels/request";
+import { ItemData } from "@/lib/server/DatabaseModels/item";
 import { useEffect, useState } from "react";
 import PaginationControls from "../../pagination-controls";
 import ItemCard from "./item-card";
@@ -16,7 +16,7 @@ export default function RequestItemsList({
 }) {
 	const [requestItems, setRequestItems] = useState<ItemData[]>(items);
 	const [error, setError] = useState<string | null>(null);
-	const [currentPage, setCurrentPage] = useState(1);
+	const [currentPage, setCurrentPage] = useState(totalItemCount > 0 ? 1 : 0);
 	const [itemCount, setItemCount] = useState(totalItemCount);
 	const itemsPerPage = 10;
 
@@ -62,6 +62,9 @@ export default function RequestItemsList({
 			const newItem = data.item;
 			setRequestItems((prevItems) => [...prevItems, newItem]);
 			setItemCount((prevCount) => prevCount + 1);
+			if (currentPage === 0) {
+				setCurrentPage(1);
+			}
 		}
 	};
 

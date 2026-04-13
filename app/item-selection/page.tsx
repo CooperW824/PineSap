@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getInventoryItemById } from "@/lib/server/inventory/items";
+import { PersistedItem } from "@/lib/server/DatabaseModels/item";
 
 const detailCardClassName = "rounded-2xl border border-base-300 bg-base-100 px-4 py-4 shadow-sm";
 
@@ -45,7 +45,7 @@ export default async function ItemSelectionPage({ searchParams }: ItemSelectionP
 	const itemId = Array.isArray(resolvedSearchParams.itemId)
 		? resolvedSearchParams.itemId[0]
 		: resolvedSearchParams.itemId;
-	const selectedItem = itemId ? await getInventoryItemById(itemId) : undefined;
+	const selectedItem = itemId ? await PersistedItem.getById(itemId) : undefined;
 
 	return (
 		<main
@@ -87,10 +87,7 @@ export default async function ItemSelectionPage({ searchParams }: ItemSelectionP
 											value={selectedItem.description ?? "No description provided"}
 											className="lg:col-span-2"
 										/>
-										<DetailField
-											label="Quantity of Item"
-											value={String(selectedItem.stockQuantity)}
-										/>
+										<DetailField label="Quantity of Item" value={String(selectedItem.quantity)} />
 										<DetailField
 											label="Place of Purchase"
 											value={selectedItem.placeOfPurchase ?? "Unknown"}

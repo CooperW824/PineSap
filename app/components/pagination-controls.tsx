@@ -34,13 +34,13 @@ export default function PaginationControls({
           onPageChange(currentPage - 1);
           setInputValue((prev) => (Number(prev) - 1).toString());
         }}
-        disabled={currentPage === 1}
+        disabled={currentPage === 1 || totalPages === 0}
       >
         &lt;&lt;
       </button>
       <div className="join-item flex items-center w-fit bg-base-200 px-2">
         <input
-          className="input input-neutral rounded-sm mx-0 w-8 h-7 bg-base-300 mr-1 text-center"
+          className="input input-neutral rounded-sm mx-0 w-8 h-7 bg-base-300 mr-1 text-center p-0"
           value={inputValue}
           onChange={handleInputChange}
           onBlur={handleInputBlur}
@@ -53,7 +53,7 @@ export default function PaginationControls({
           onPageChange(currentPage + 1);
           setInputValue((prev) => (Number(prev) + 1).toString());
         }}
-        disabled={currentPage === totalPages}
+        disabled={currentPage === totalPages || totalPages === 0}
       >
         &gt;&gt;
       </button>

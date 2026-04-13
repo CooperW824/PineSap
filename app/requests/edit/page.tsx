@@ -4,7 +4,7 @@ import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Request as PersistedRequest } from "@/lib/server/DatabaseModels/request";
+import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import RequestNameEdit from "@/app/components/Requests/name-edit";
 import RequestDecriptionEdit from "@/app/components/Requests/description-edit";
 import RequestSubmitButton from "@/app/components/Requests/submit-request-button";
@@ -22,8 +22,8 @@ export default async function EditRequestPage(params: { searchParams: Promise<{ 
 
 	const user = await PersistedUser.getById(session.user.id);
 	const authorizer = new Authorizer(user!);
-	const request = await PersistedRequest.fromId(requestId);
-	const requestOwner = await PersistedUser.getById(request?.getOwnerId() || "");
+	const request = await PersistedRequest.getById(requestId);
+	const requestOwner = await PersistedUser.getById(request?.ownerId || "");
 
 	if (!request || !requestOwner) {
 		redirect("/not-found");
@@ -50,9 +50,9 @@ export default async function EditRequestPage(params: { searchParams: Promise<{ 
 					<option>Epic Beehive Project</option>
 				</select>
 
-				<RequestNameEdit requestId={requestId} name={request.getName()} />
+				<RequestNameEdit requestId={requestId} name={request.name} />
 
-				<RequestDecriptionEdit requestId={requestId} description={request.getPurpose() || ""} />
+				<RequestDecriptionEdit requestId={requestId} description={request.purpose || ""} />
 
 				<RequestItemsList requestId={requestId} items={items} totalItemCount={totalItems} />
 
