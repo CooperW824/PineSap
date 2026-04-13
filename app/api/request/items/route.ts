@@ -183,8 +183,8 @@ export async function PATCH(request: Request) {
 		item.description = itemData.description;
 	}
 
-	if (itemData.physicalLocation) {
-		item.physicalLocation = itemData.physicalLocation;
+	if (itemData.placeOfPurchase) {
+		item.placeOfPurchase = itemData.placeOfPurchase;
 	}
 
 	await item.save();
