@@ -1,7 +1,18 @@
-import prisma from "@/lib/server/prisma";
+import { PrismaClient } from "../generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { createAuthClient } from "better-auth/client";
 import { Command } from "commander";
 import * as readline from "readline";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+const prisma = new PrismaClient({
+  adapter,
+});
 
 const client = createAuthClient({
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",

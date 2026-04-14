@@ -1,70 +1,41 @@
 // import { ChevronDown, Plus, RotateCcw, Trash2, UserRound } from "lucide-react";
-import Link from "next/link"
-
+import Link from "next/link";
 // sample requests, delete later
-const sampleRequests = [
-  {
-    name: "the most important purchase",
-    totalItems: "1",
-    totalPrice: "67",
-    Requester: "Important guy",
-    status: "APROVED",
-  },
-  {
-    name: "PLEASE WE NEED THIS",
-    totalItems: "999",
-    totalPrice: "0.03",
-    Requester: "not important guy",
-    status: "DENIED",
-  },
-];
+import { auth } from "@/lib/server/auth";
+import { headers } from "next/headers";
+import { PersistedUser } from "@/lib/server/DatabaseModels/user";
+import { Authorizer } from "@/lib/server/authorization/authorization";
+import { redirect } from "next/navigation";
+import CreateRequestButton from "../components/Requests/create-request-button";
+import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
+import RequestsList from "../components/Requests/requests-list";
 
-export default function RequestsPage() {
-  return (
-    <main className="p-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Requests</h1>
+export default async function RequestsPage() {
+	const session = await auth.api.getSession({ headers: await headers() });
+	let canView = false;
+	let canSubmit = false;
 
-        <Link href="/requests/create">
-          <button className="btn btn-primary">
-            Create Request
-          </button>
-        </Link>
+	if (session) {
+		const user = await PersistedUser.getById(session.user.id);
+		const authorizer = new Authorizer(user!);
+		canView = authorizer.requests().canView();
+		canSubmit = authorizer.requests().canSubmit();
+	}
 
-      </div>
-      <div className="space-y-3">
-        <div className="mt-6 rounded-2xl bg-base-200 p-6">
-          <div className="space-y-4">
-            {sampleRequests.map((request) => (
-              <Link
-                key={request.name}
-                href="/requests/view"
-                className="block"
-              > {/* need to make the link element behave like a block so we can have proper spacing, may not be neccesary
-              when we have non-sample requests.*/}
-                <div className="card bg-base-300 shadow p-8 cursor-pointer hover:shadow-lg">
-                  
-                  <div className="flex justify-between">
-                    
-                    <div>
-                      <p className="font-bold">Name: {request.name}</p>
-                      <p>Status: {request.status}</p>
-                      <p>Requester: {request.Requester}</p>
-                    </div>
+	if (!canView) {
+		redirect("/not-found");
+	}
 
-                    <div className="text-right">
-                      <p>Items: {request.totalItems}</p>
-                      <p>Price: {request.totalPrice}</p>
-                    </div>
+	const requests = await PersistedRequest.list(10, 1);
+	const totalRequestCount = await PersistedRequest.count();
 
-                  </div>
-
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </main>
-  )
+	return (
+		<main className="p-6 flex flex-col w-full justify-start items-center">
+			<div className="flex justify-between items-center mb-4 w-3/4">
+				<h1 className="text-3xl font-bold">Requests</h1>
+				{canSubmit && <CreateRequestButton />}
+			</div>
+			<RequestsList requests={requests} totalCount={totalRequestCount} />
+		</main>
+	);
 }

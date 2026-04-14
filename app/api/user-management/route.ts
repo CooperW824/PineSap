@@ -117,7 +117,7 @@ export async function DELETE(request: Request) {
     });
   }
 
-  const { userId } = await request.json();
+  const {userId } = await request.json();
 
   if (!userId) {
     return new Response(JSON.stringify({ error: "User ID is required" }), {

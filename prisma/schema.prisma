@@ -12,74 +12,54 @@ datasource db {
   provider = "postgresql"
 }
 
-// TODO: Add user model among other models described in CRC. I.E when Cooper is done with auth. 
-
-// Notes from Nick:
-// Changed to explicitly declare a many to many relationship. 
-
-/// A type of item that can be on campus or pending in a request. 
 model Item {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
-  createdAt DateTime @default(now()) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  name String @db.VarChar(100) /// User Given Name of Item.
-  description String? @db.VarChar(300) /// User Given Description of Item.
-  physicalLocation String? @db.VarChar(40) /// The physical location on campus where an item exists.
-  placeOfPurchase String? @db.VarChar(100) /// Where the item will be or was purchased from. 
+  name             String /// User Given Name of Item.
+  description      String? /// User Given Description of Item.
+  physicalLocation String? /// The physical location on campus where an item exists.
+  placeOfPurchase  String? /// Where the item will be or was purchased from. 
+  price            Float
+  stockQuantity    Int        @default(0)
+  status           ItemStatus @default(PENDING_APPROVAL) /// The status of the item.
 
-  // TODO: Verify if this is a good way of storing price.  
-  price Decimal @db.Decimal(20, 2) /// The last known price of an item.
-  stockQuantity Int @default(0) /// The amount of an item in stock. 
+  requestId String? /// The id of the request that the item is in.
+  request   Request? @relation(fields: [requestId], references: [id]) /// The request that the item is in.
+}
 
-  // TODO: Add in any more fields
-
-  requestItems RequestItem[] /// The item can be in many different requests. 
+enum ItemStatus {
+  PENDING_APPROVAL
+  AWAITING_PURCHASE
+  PURCHASED
+  ON_CAMPUS
+  DENIED
 }
 
 /// A pending, approved, or temrinated, bundle of items to be purchased. 
 model Request {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  name String @db.VarChar(100) /// The name of the request. 
-  purpose String? @db.VarChar(300) /// The reason why the items in the request are needed.
+  id           String        @id @default(uuid()) /// The id of the request.
+  createdAt    DateTime      @default(now())
+  name         String        @db.VarChar(100) /// The name of the request. 
+  purpose      String?       @db.VarChar(300) /// The reason why the items in the request are needed.
+  requestItems Item[] /// The items that are in the request.
+  status       RequestStatus @default(NOT_SUBMITTED) /// Can be 'Pending', 'Denied', or 'Approved'.
+  totalCost    Float         @default(0) /// The total cost of the request, calculated as the sum of the cost of all items in the request.
 
-  // TODO: Add in a user entity for who created the request. 
+  ownerId String /// The id of the user who created the request.
+  owner   User   @relation(name: "authoredRequests", fields: [ownerId], references: [id]) /// The user who created the request.
+
   // TODO: Add in a user entity for who approved the request.
 
-  // TODO: Verify if this is a good way to keep track of status. 
-  status RequestStatus @default(PENDING) /// Can be 'Pending', 'Denied', or 'Approved'.
-  // We can perhaps have a pending bool field instead. 
-
-  // TODO: Verify if we should store this and if there's a way to automate it from items.  
-  price Decimal @db.Decimal(20, 2) /// The last known price of an item.
-
-  // TODO: Add in any more fields
-
-
-  requestItems RequestItem[] /// The items contained in the request. 
+  approvers User[] @relation(name: "approvedRequests") /// The users who approved the request.
 }
 
 /// Statuses of a request. 
 enum RequestStatus {
+  NOT_SUBMITTED
   PENDING
   APPROVED
   DENIED
-}
-
-// This essentially means there is one RequestItem for every Item and Request pair made.  
-/// Explicit many to many relationship between items and request. 
-model RequestItem {
-  id Int @id @default(autoincrement())
-
-  request Request @relation(fields: [requestId], references: [id])
-  requestId Int /// The id of the request. 
-
-  item Item @relation(fields: [itemId], references: [id])
-  itemId Int /// The id of the item in the request. 
-
-  quantity Int /// The nummber of items for a request. 
-  price Decimal @db.Decimal(20, 2) /// Price at the time of request creation. 
-
-  @@unique([requestId, itemId]) /// Stops the same item being added twice to the same request. 
 }
