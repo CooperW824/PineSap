@@ -1,142 +1,164 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import ProjectCard from "./ProjectCard";
 import { Project } from "../types/types";
 
 export default function AdminProjectList() {
-  const [clubProjects, setClubProjects] = useState<Project[]>([]);
-  const [showProjectModal, setShowProjectModal] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
-  const [showReviewerModal, setShowReviewerModal] = useState(false);
-  const [reviewerEmail, setReviewerEmail] = useState("");
-  const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
-  const [newlyAddedId, setNewlyAddedId] = useState<number | null>(null);
+	const [clubProjects, setClubProjects] = useState<Project[]>([]);
+	const [showProjectModal, setShowProjectModal] = useState(false);
+	const [newProjectName, setNewProjectName] = useState("");
+	const [showReviewerModal, setShowReviewerModal] = useState(false);
+	const [reviewerEmail, setReviewerEmail] = useState("");
+	const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
-  const handleCreateProject = () => {
-    if (!newProjectName) return;
+	useEffect(() => {
+		fetch("/api/projects")
+			.then((res) => res.json())
+			.then((data) => setClubProjects(data.projects));
+	}, []);
 
-    const newProject: Project = {
-      id: Date.now(),
-      name: newProjectName,
-      reviewers: [],
-    };
+	const handleCreateProject = async () => {
+		if (!newProjectName.trim()) return;
 
-    setClubProjects((prev) => [newProject, ...prev]);
+		const response = await fetch("/api/projects", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name: newProjectName }),
+		});
 
-    setNewProjectName("");
-    setShowProjectModal(false);
+		if (!response.ok) return;
 
-    setNewlyAddedId(newProject.id);
-    setTimeout(() => setNewlyAddedId(null), 400);
-  };
+		const data = await response.json();
 
-  const handleAddReviewer = () => {
-    if (!activeProjectId || !reviewerEmail) return;
+		setClubProjects((prev) => [data.project, ...prev]);
 
-    setClubProjects((prev) =>
-      prev.map((project) =>
-        project.id === activeProjectId
-          ? { ...project, reviewers: [...project.reviewers, reviewerEmail] }
-          : project,
-      ),
-    );
+		setNewProjectName("");
+		setShowProjectModal(false);
+	};
 
-    setReviewerEmail("");
-    setActiveProjectId(null);
-    setShowReviewerModal(false);
-  };
+	const handleAddReviewer = async () => {
+		if (!activeProjectId || !reviewerEmail.trim()) return;
 
-  const handleRemoveReviewer = (projectId: number, email: string) => {
-    setClubProjects((prev) =>
-      prev.map((project) =>
-        project.id === projectId
-          ? {
-              ...project,
-              reviewers: project.reviewers.filter((r) => r !== email),
-            }
-          : project,
-      ),
-    );
-  };
+		const response = await fetch("/api/projects", {
+			method: "PATCH",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				projectId: activeProjectId,
+				email: reviewerEmail,
+			}),
+		});
 
-  return (
-    <>
-      {/* PROJECT SECTION */}
-      <section className="space-y-4 w-full">
-        <div className="flex justify-between items-center w-full">
-          <h2 className="text-lg font-semibold">Projects</h2>
+		if (!response.ok) return;
 
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowProjectModal(true)}
-          >
-            New Project
-          </button>
-        </div>
+		const data = await response.json();
 
-        {/* PROJECT LIST */}
-        <div className="grid gap-4 w-full">
-          {clubProjects.length > 0 ? (
-            clubProjects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onAddReviewer={() => {
-                  setActiveProjectId(project.id);
-                  setShowReviewerModal(true);
-                }}
-                onRemoveReviewer={(email) =>
-                  handleRemoveReviewer(project.id, email)
-                }
-              />
-            ))
-          ) : (
-            <p className="opacity-70">No projects yet.</p>
-          )}
-        </div>
-      </section>
+		setClubProjects((prev) =>
+			prev.map((project) =>
+				project.id === activeProjectId ? data.project : project,
+			),
+		);
 
-      {/* CREATE PROJECT MODAL */}
-      <Modal
-        open={showProjectModal}
-        title="Create Project"
-        onClose={() => setShowProjectModal(false)}
-        actions={
-          <button className="btn btn-primary" onClick={handleCreateProject}>
-            Create
-          </button>
-        }
-      >
-        <input
-          type="text"
-          placeholder="Project name"
-          className="input input-bordered w-full mb-4"
-          value={newProjectName}
-          onChange={(e) => setNewProjectName(e.target.value)}
-        />
-      </Modal>
+		setReviewerEmail("");
+		setActiveProjectId(null);
+		setShowReviewerModal(false);
+	};
 
-      {/* ADD REVIEWER MODAL */}
-      <Modal
-        open={showReviewerModal}
-        title="Add Reviewer"
-        onClose={() => setShowReviewerModal(false)}
-        actions={
-          <button className="btn btn-primary" onClick={handleAddReviewer}>
-            Add
-          </button>
-        }
-      >
-        <input
-          type="email"
-          placeholder="Reviewer email"
-          className="input input-bordered w-full mb-4"
-          value={reviewerEmail}
-          onChange={(e) => setReviewerEmail(e.target.value)}
-        />
-      </Modal>
-    </>
-  );
+	const handleRemoveReviewer = async ( projectId: string, email: string, ) => {
+		
+		const response = await fetch("/api/projects", {
+			method: "DELETE",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				projectId,
+				email,
+			}),
+		});
+
+		if (!response.ok) return;
+
+		const data = await response.json();
+
+		setClubProjects((prev) =>
+			prev.map((project) =>
+				project.id === projectId ? data.project : project,
+			),
+		);
+	};
+
+	return (
+		<>
+			<section className="w-full space-y-4">
+				<div className="flex w-full items-center justify-between">
+					<h2 className="text-lg font-semibold">Projects</h2>
+
+					<button
+						className="btn btn-primary"
+						onClick={() => setShowProjectModal(true)}
+					>
+						New Project
+					</button>
+				</div>
+
+				<div className="grid w-full gap-4">
+					{clubProjects.length > 0 ? (
+						clubProjects.map((project) => (
+							<ProjectCard
+								key={project.id}
+								project={project}
+								onAddReviewer={() => {
+									setActiveProjectId(project.id);
+									setShowReviewerModal(true);
+								}}
+								onRemoveReviewer={(email) =>
+									handleRemoveReviewer(project.id, email)
+								}
+							/>
+						))
+					) : (
+						<p className="opacity-70">No projects yet.</p>
+					)}
+				</div>
+			</section>
+
+			<Modal
+				open={showProjectModal}
+				title="Create Project"
+				onClose={() => setShowProjectModal(false)}
+				actions={
+					<button className="btn btn-primary" onClick={handleCreateProject}>
+						Create
+					</button>
+				}
+			>
+				<input
+					type="text"
+					placeholder="Project name"
+					className="input input-bordered mb-4 w-full"
+					value={newProjectName}
+					onChange={(e) => setNewProjectName(e.target.value)}
+				/>
+			</Modal>
+
+			<Modal
+				open={showReviewerModal}
+				title="Add Reviewer"
+				onClose={() => setShowReviewerModal(false)}
+				actions={
+					<button className="btn btn-primary" onClick={handleAddReviewer}>
+						Add
+					</button>
+				}
+			>
+				<input
+					type="email"
+					placeholder="Reviewer email"
+					className="input input-bordered mb-4 w-full"
+					value={reviewerEmail}
+					onChange={(e) => setReviewerEmail(e.target.value)}
+				/>
+			</Modal>
+		</>
+	);
 }
