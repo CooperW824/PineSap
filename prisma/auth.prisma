@@ -1,73 +1,79 @@
 model User {
-    id            String    @id
-    name          String
-    email         String
-    emailVerified Boolean   @default(false)
-    image         String?
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
-    role          Role      @default(external)
-    banned        Boolean?  @default(false)
-    banReason     String?
-    banExpires    DateTime?
-    sessions      Session[]
-    accounts      Account[]
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          Role      @default(external)
+  banned        Boolean?  @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  sessions      Session[]
+  accounts      Account[]
 
-    @@unique([email])
-    @@map("user")
+  authoredRequests Request[] @relation("authoredRequests") /// The requests created by the user.
+
+  approvedRequests Request[] @relation("approvedRequests") /// The requests approved by the user.
+
+  projectApprovals Project[] @relation("projectApprovers") /// The projects this user can approve.
+
+  @@unique([email])
+  @@map("user")
 }
 
 enum Role {
-    external
-    member
-    admin
+  external
+  member
+  admin
 }
 
 model Session {
-    id             String   @id
-    expiresAt      DateTime
-    token          String
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @updatedAt
-    ipAddress      String?
-    userAgent      String?
-    userId         String
-    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    impersonatedBy String?
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
 
-    @@unique([token])
-    @@index([userId])
-    @@map("session")
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
 }
 
 model Account {
-    id                    String    @id
-    accountId             String
-    providerId            String
-    userId                String
-    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    accessToken           String?
-    refreshToken          String?
-    idToken               String?
-    accessTokenExpiresAt  DateTime?
-    refreshTokenExpiresAt DateTime?
-    scope                 String?
-    password              String?
-    createdAt             DateTime  @default(now())
-    updatedAt             DateTime  @updatedAt
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-    @@index([userId])
-    @@map("account")
+  @@index([userId])
+  @@map("account")
 }
 
 model Verification {
-    id         String   @id
-    identifier String
-    value      String
-    expiresAt  DateTime
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-    @@index([identifier])
-    @@map("verification")
+  @@index([identifier])
+  @@map("verification")
 }

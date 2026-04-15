@@ -3,7 +3,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/client/auth-client";
 import { User } from "better-auth";
 import Image from "next/image";
-import Logo from "../assets/Logo_SVG.svg";
+import Logo from "../assets/Logo_SVG_White_2.svg";
 
 export default function TopBar() {
   const { data: Session } = authClient.useSession();
