@@ -8,7 +8,7 @@ import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import RequestNameEdit from "@/app/components/Requests/name-edit";
 import RequestDecriptionEdit from "@/app/components/Requests/description-edit";
 import RequestSubmitButton from "@/app/components/Requests/submit-request-button";
-import RequestItemsList from "@/app/components/Requests/Items/items-list";
+import RequestItemsList from "@/app/components/Requests/Items/editable-items-list";
 
 export default async function EditRequestPage(params: { searchParams: Promise<{ id: string }> }) {
 	// Get the request id from the url query parameters

@@ -34,7 +34,7 @@ export default function RequestsList({
 	return (
 		<div className="space-y-3 w-3/4">
 			{paginatedRequests.map((request) => (
-				<Link key={request.id} href="/requests/view" className="block">
+				<Link key={request.id} href={`/requests/view?id=${request.id}`} className="block">
 					<div className="card bg-base-200 shadow p-8 cursor-pointer hover:shadow-lg hover:bg-base-300 transition-colors">
 						<div className="flex justify-between">
 							<div>
