@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 export default function PasswordInput({
   onChange,
   placeholder = "Password",
@@ -9,6 +11,8 @@ export default function PasswordInput({
   placeholder?: string;
   disabled?: boolean;
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <>
       <label className="input validator input-neutral my-2">
@@ -29,7 +33,7 @@ export default function PasswordInput({
           </g>
         </svg>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           required
           placeholder={placeholder}
           minLength={8}
@@ -38,6 +42,28 @@ export default function PasswordInput({
           disabled={disabled}
           onChange={(e) => onChange?.(e.target.value)}
         />
+        <button
+          type="button"
+          className="btn btn-ghost btn-xs btn-circle"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+          onClick={() => setShowPassword((current) => !current)}
+          disabled={disabled}
+        >
+          <svg
+            className="h-[1.1em] w-[1.1em] opacity-60"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r={showPassword ? "6.5" : "4.5"}
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        </button>
       </label>
       <p className="validator-hint hidden">
         Must be more than 8 characters, including

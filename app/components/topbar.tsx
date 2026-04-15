@@ -15,7 +15,7 @@ export default function TopBar() {
       className="navbar w-full bg-base-200 bg-border-300"
     >
       <div className="flex w-full items-center justify-between">
-        <div className="flex items-center pl-3">
+        <Link href="/" className="flex items-center pl-3">
           <Image
             src={Logo}
             alt="PineSap Logo"
@@ -24,8 +24,8 @@ export default function TopBar() {
             className="mr-2"
             color="white"
           />
-          <div className="px-1 text-xl font-semibold text-heading">PineSap</div>
-        </div>
+          <div className="px-4 text-xl font-semibold text-heading">PineSap</div>
+        </Link>
         {user ? (
           <div className="flex items-center gap-4">
             <span className="text-lg font-medium">Welcome, {user.name}</span>
