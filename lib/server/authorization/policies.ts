@@ -60,3 +60,15 @@ export class UserManagementPolicy {
 		return hasAccess(this.user, "admin");
 	}
 }
+
+export class ItemPolicy {
+	private user: User;
+
+	constructor(user: User) {
+		this.user = user;
+	}
+
+	canEdit(): boolean {
+		return hasAccess(this.user, "admin");
+	}
+}
