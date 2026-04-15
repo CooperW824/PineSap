@@ -54,6 +54,9 @@ model Request {
   // TODO: Add in a user entity for who approved the request.
 
   approvers User[] @relation(name: "approvedRequests") /// The users who approved the request.
+
+  projectId String?
+  project   Project? @relation(name: "projectRequests", fields: [projectId], references: [id]) /// The project this request belongs to.
 }
 
 /// Statuses of a request. 
@@ -62,4 +65,16 @@ enum RequestStatus {
   PENDING
   APPROVED
   DENIED
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  name   String
+  budget Float @default(0)
+
+  requests  Request[] @relation(name: "projectRequests")
+  approvers User[]    @relation("projectApprovers")
 }
