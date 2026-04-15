@@ -56,8 +56,8 @@ export class PersistedProject extends DatabaseObject implements Project {
   ): Promise<PersistedProject> {
     const project = await prisma.project.create({
       data: {
-        name: data.name ?? "", // default to empty str if name isnt there
-        budget: data.budget ?? 0, // same but 0
+        name: data.name ?? "", // Default to empty string if name isnt there
+        budget: data.budget ?? 0,
       },
     });
 
