@@ -16,6 +16,7 @@ export interface Project {
 
   getRequests(pageNumber: number, pageSize: number): Promise<RequestData[]>;
   countRequests(): Promise<number>;
+  getTotalSpentOnApprovedRequests(): Promise<number>;
   addRequest(requestId: string): Promise<void>;
 
   listApprovers(): Promise<UserData[]>;
@@ -109,6 +110,20 @@ export class PersistedProject extends DatabaseObject implements Project {
     return prisma.request.count({
       where: { projectId: this.id },
     });
+  }
+  
+  async getTotalSpentOnApprovedRequests(): Promise<number> {
+    const agg = await prisma.request.aggregate({
+      where: {
+        projectId: this.id,
+        status: "APPROVED",
+      },
+      _sum: {
+        totalCost: true,
+      },
+    });
+
+    return agg._sum.totalCost ?? 0;
   }
 
   async addRequest(requestId: string): Promise<void> {
