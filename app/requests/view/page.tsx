@@ -45,7 +45,7 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 		<main className="p-6 flex flex-col items-center w-full">
 			<div className="flex w-1/2 items-start justify-between">
 				<h1 className="text-3xl font-bold">Request: {request.name}</h1>
-				{canEdit && request.status === "PENDING" && (
+				{canEdit && request.status !== "APPROVED" && (
 					<Link href={`/requests/edit/?id=${requestId}`} className="btn btn-primary ml-4">
 						Edit Request
 					</Link>

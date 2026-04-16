@@ -95,6 +95,10 @@ export async function PATCH(request: Request) {
 		}
 	}
 
+	if (requestData.status && requestData.status === "PENDING") {
+		await existingRequest.submitForApproval();
+	}
+
 	await existingRequest.save();
 
 	return new Response(

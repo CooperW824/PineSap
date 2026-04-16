@@ -31,6 +31,7 @@ interface Request {
 	removeItem(itemId: string): Promise<void>;
 	approve(): Promise<void>;
 	deny(): Promise<void>;
+	submitForApproval(): Promise<void>;
 
 	set name(newName: string);
 	set purpose(newPurpose: string | null);
@@ -305,6 +306,14 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			totalCost: request.totalCost,
 			projectId: request.projectId,
 		}));
+	}
+
+	async submitForApproval(): Promise<void> {
+		this.m_status = "PENDING";
+		await prisma.request.update({
+			where: { id: this.id },
+			data: { status: "PENDING" },
+		});
 	}
 
 	async approve(): Promise<void> {
