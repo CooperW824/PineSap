@@ -17,6 +17,8 @@ model User {
 
   approvedRequests Request[] @relation("approvedRequests") /// The requests approved by the user.
 
+  projectApprovals Project[] @relation("projectApprovers") /// The projects this user can approve.
+
   @@unique([email])
   @@map("user")
 }

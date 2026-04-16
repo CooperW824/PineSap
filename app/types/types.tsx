@@ -1,5 +1,6 @@
 export type Project = {
-  id: number;
-  name: string;
-  reviewers: string[];
-};
+	id: string;
+	name: string;
+	budget?: number;
+	reviewers: string[];
+}; // changed to fit the schema
