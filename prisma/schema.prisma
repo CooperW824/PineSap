@@ -42,8 +42,8 @@ enum ItemStatus {
 model Request {
   id           String        @id @default(uuid()) /// The id of the request.
   createdAt    DateTime      @default(now())
-  name         String        @db.VarChar(100) /// The name of the request. 
-  purpose      String?       @db.VarChar(300) /// The reason why the items in the request are needed.
+  name         String /// The name of the request. 
+  purpose      String? /// The reason why the items in the request are needed.
   requestItems Item[] /// The items that are in the request.
   status       RequestStatus @default(NOT_SUBMITTED) /// Can be 'Pending', 'Denied', or 'Approved'.
   totalCost    Float         @default(0) /// The total cost of the request, calculated as the sum of the cost of all items in the request.
@@ -73,7 +73,7 @@ model Project {
   updatedAt DateTime @default(now()) @updatedAt
 
   name   String
-  budget Float @default(0)
+  budget Float  @default(0)
 
   requests  Request[] @relation(name: "projectRequests")
   approvers User[]    @relation("projectApprovers")

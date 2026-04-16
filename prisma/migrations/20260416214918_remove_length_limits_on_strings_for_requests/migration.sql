@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Request" ALTER COLUMN "name" SET DATA TYPE TEXT,
+ALTER COLUMN "purpose" SET DATA TYPE TEXT;

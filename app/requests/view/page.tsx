@@ -1,3 +1,4 @@
+import BackButton from "@/app/components/back-button";
 import StaticRequestItemsList from "@/app/components/Requests/Items/static-items-list";
 import RequestApprovalButtons from "@/app/components/Requests/request-approval-buttons";
 import { auth } from "@/lib/server/auth";
@@ -49,6 +50,10 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 						Edit Request
 					</Link>
 				)}
+			</div>
+
+			<div className="w-1/2 my-2">
+				<BackButton href="/requests" />
 			</div>
 
 			<div className="w-1/2">
