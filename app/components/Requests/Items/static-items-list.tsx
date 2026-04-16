@@ -36,16 +36,23 @@ export default function RequestItemsList({
 	return (
 		<div>
 			{error && <p className="text-red-500">{error}</p>}
-			<ul className="divide-y divide-gray-200">
+
+			<ul className="flex flex-col items-start justify-start w-full">
+				<div className="flex items-center justify-between mb-4 w-full">
+					<h2 className="text-xl font-bold">Items</h2>
+					<p className="text-sm opacity-70 border border-white rounded-full ml-2 px-3 py-1">
+						{itemCount} {itemCount === 1 ? "item" : "items"}
+					</p>
+				</div>
 				{requestItems.map((item) => (
 					<StaticItemCard key={item.id} item={item} requestId={requestId} />
 				))}
+				<PaginationControls
+					currentPage={currentPage}
+					totalPages={Math.ceil(itemCount / itemsPerPage)}
+					onPageChange={onPageChange}
+				/>
 			</ul>
-			<PaginationControls
-				currentPage={currentPage}
-				totalPages={Math.ceil(itemCount / itemsPerPage)}
-				onPageChange={onPageChange}
-			/>
 		</div>
 	);
 }

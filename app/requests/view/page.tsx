@@ -4,6 +4,7 @@ import { Authorizer } from "@/lib/server/authorization/authorization";
 import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function ViewRequestPage(params: { searchParams: Promise<{ id: string }> }) {
@@ -33,10 +34,17 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 	const canEdit = authorizer.requests().canEdit((await PersistedUser.getById(request.ownerId))!);
 
 	return (
-		<main className="p-6">
-			<h1 className="text-3xl font-bold">{request.name}</h1>
+		<main className="p-6 flex flex-col items-center w-full">
+			<div className="flex w-1/2 items-start justify-between">
+				<h1 className="text-3xl font-bold">Request: {request.name}</h1>
+				{canEdit && (
+					<Link href={`/requests/edit/?id=${requestId}`} className="btn btn-primary ml-4">
+						Edit Request
+					</Link>
+				)}
+			</div>
 
-			<div className="mt-6 space-y-6">
+			<div className="w-1/2">
 				{/* project */}
 				<div>
 					<p className="text-sm opacity-70">Project</p>
@@ -53,7 +61,6 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 
 				{/* items */}
 				{/* header */}
-				<h2 className="text-xl font-bold">Items</h2>
 
 				<StaticRequestItemsList requestId={requestId} items={items} totalItemCount={totalItems} />
 
@@ -79,4 +86,3 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 		</main>
 	);
 }
-
