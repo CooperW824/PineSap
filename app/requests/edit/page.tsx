@@ -9,6 +9,8 @@ import RequestNameEdit from "@/app/components/Requests/name-edit";
 import RequestDecriptionEdit from "@/app/components/Requests/description-edit";
 import RequestSubmitButton from "@/app/components/Requests/submit-request-button";
 import RequestItemsList from "@/app/components/Requests/Items/editable-items-list";
+import { PersistedProject } from "@/lib/server/DatabaseModels/project";
+import RequestProjectSelector from "@/app/components/Requests/project-selector";
 
 export default async function EditRequestPage(params: { searchParams: Promise<{ id: string }> }) {
 	// Get the request id from the url query parameters
@@ -36,6 +38,8 @@ export default async function EditRequestPage(params: { searchParams: Promise<{ 
 	const items = await request.getItems(1, 10); // Fetch first page of items for the request
 	const totalItems = await request.countItems();
 
+	const projects = await PersistedProject.list(100, 1); // Fetch first 100 projects for the project selection dropdown
+
 	return (
 		<main className="p-6">
 			<h1 className="text-3xl font-bold">Create Request</h1>
@@ -43,12 +47,7 @@ export default async function EditRequestPage(params: { searchParams: Promise<{ 
 			<div className="mt-6 space-y-6">
 				{/* TODO: Implement proper project selection */}
 				{/* Select project */}
-				<select className="select select-bordered w-full max-w-xs" defaultValue={"Select Project"}>
-					<option disabled>Select Project</option>
-					<option>Rocket Test</option>
-					<option>Aquararium Build</option>
-					<option>Epic Beehive Project</option>
-				</select>
+				<RequestProjectSelector requestId={requestId} projects={projects} currentProjectId={request.projectId} />
 
 				<RequestNameEdit requestId={requestId} name={request.name} />
 

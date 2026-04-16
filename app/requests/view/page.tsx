@@ -1,6 +1,8 @@
 import StaticRequestItemsList from "@/app/components/Requests/Items/static-items-list";
+import RequestApprovalButtons from "@/app/components/Requests/request-approval-buttons";
 import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
+import { PersistedProject } from "@/lib/server/DatabaseModels/project";
 import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { headers } from "next/headers";
@@ -33,6 +35,11 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 
 	const canEdit = authorizer.requests().canEdit((await PersistedUser.getById(request.ownerId))!);
 
+	const project = await PersistedProject.getById(request.projectId || ""); // Fetch the project associated with the request, if any
+	const projectApprovers = project ? (await project.listApprovers()).map((user) => user.email) : [];
+
+	const canReview = authorizer.requests().canReview(projectApprovers);
+
 	return (
 		<main className="p-6 flex flex-col items-center w-full">
 			<div className="flex w-1/2 items-start justify-between">
@@ -48,40 +55,20 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 				{/* project */}
 				<div>
 					<p className="text-sm opacity-70">Project</p>
-					<p className="text-lg font-semibold">Rocket Club</p>
+					<p className="text-lg font-semibold">{project ? project.name : "No project assigned"}</p>
 				</div>
 
 				{/* purpose*/}
-				<div>
+				<div className="mb-4">
 					<p className="text-sm opacity-70">Purpose</p>
 					<p className="text-base">
 						{request.purpose !== "" ? request.purpose : "No purpose provided"}
 					</p>
 				</div>
 
-				{/* items */}
-				{/* header */}
+				{canReview && <RequestApprovalButtons requestId={requestId} />}
 
 				<StaticRequestItemsList requestId={requestId} items={items} totalItemCount={totalItems} />
-
-				{/* sensibily sized buttons 
-        <div className="flex gap-10">
-          <button className="btn btn-success">
-            Approve
-          </button>
-
-          <button className="btn btn-error">
-            Deny
-          </button>
-        </div>
-            */}
-
-				{/* comicall large buttons
-				<div className="flex gap-4 mt-6">
-					<button className="btn btn-success w-1/2 h-32 text-xl">Approve</button>
-
-					<button className="btn btn-error w-1/2 h-32 text-xl">Deny</button>
-				</div> */}
 			</div>
 		</main>
 	);

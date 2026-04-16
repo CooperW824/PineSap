@@ -10,6 +10,7 @@ export type RequestData = {
 	status: RequestStatus;
 	ownerId: string;
 	totalCost: number;
+	projectId: string | null;
 };
 
 interface Request {
@@ -19,6 +20,10 @@ interface Request {
 	get status(): RequestStatus;
 	get ownerId(): string;
 	get totalCost(): number;
+	get projectId(): string | null;
+
+	setProject(projectId: string | null): Promise<void>;
+	removeFromProject(): Promise<void>;
 
 	getItems(pageNumber: number, itemsPerPage: number): Promise<ItemData[]>;
 	countItems(): Promise<number>;
@@ -29,7 +34,7 @@ interface Request {
 
 	set name(newName: string);
 	set purpose(newPurpose: string | null);
-	set status(newStatus: RequestStatus);
+	set totalCost(newTotalCost: number);
 }
 
 export class PersistedRequest extends DatabaseObject implements Request {
@@ -38,6 +43,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 	private m_status: RequestStatus;
 	private m_ownerId: string;
 	private m_totalCost: number;
+	private m_projectId: string | null;
 
 	/// PRIVATE constructor
 	private constructor(data: RequestData) {
@@ -47,6 +53,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		this.m_status = data.status;
 		this.m_ownerId = data.ownerId;
 		this.m_totalCost = data.totalCost;
+		this.m_projectId = data.projectId;
 	}
 
 	static async getById(requestId: string): Promise<PersistedRequest | null> {
@@ -63,6 +70,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			status: request.status,
 			ownerId: request.ownerId,
 			totalCost: request.totalCost,
+			projectId: request.projectId,
 		});
 	}
 
@@ -83,6 +91,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			status: request.status,
 			ownerId: request.ownerId,
 			totalCost: request.totalCost,
+			projectId: request.projectId,
 		});
 	}
 
@@ -216,6 +225,10 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		return this.m_totalCost;
 	}
 
+	get projectId(): string | null {
+		return this.m_projectId;
+	}
+
 	set name(newName: string) {
 		this.m_name = newName;
 	}
@@ -224,12 +237,28 @@ export class PersistedRequest extends DatabaseObject implements Request {
 		this.m_purpose = newPurpose;
 	}
 
-	set status(newStatus: RequestStatus) {
-		this.m_status = newStatus;
-	}
-
 	set totalCost(newTotalCost: number) {
 		this.m_totalCost = newTotalCost;
+	}
+
+	async setProject(projectId: string | null): Promise<void> {
+		this.m_projectId = projectId;
+		await prisma.request.update({
+			where: { id: this.id },
+			data: {
+				project: { connect: { id: projectId! } },
+			},
+		});
+	}
+
+	async removeFromProject(): Promise<void> {
+		this.m_projectId = null;
+		await prisma.request.update({
+			where: { id: this.id },
+			data: {
+				project: { disconnect: true },
+			},
+		});
 	}
 
 	async save(): Promise<void> {
@@ -240,6 +269,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 				purpose: this.m_purpose,
 				status: this.m_status,
 				totalCost: this.m_totalCost,
+				projectId: this.m_projectId,
 			},
 		});
 	}
@@ -269,11 +299,12 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			status: request.status,
 			ownerId: request.ownerId,
 			totalCost: request.totalCost,
+			projectId: request.projectId,
 		}));
 	}
 
 	async approve(): Promise<void> {
-		this.status = "APPROVED";
+		this.m_status = "APPROVED";
 		await prisma.item.updateMany({
 			where: {
 				requestId: this.id,
@@ -286,7 +317,7 @@ export class PersistedRequest extends DatabaseObject implements Request {
 	}
 
 	async deny(): Promise<void> {
-		this.status = "DENIED";
+		this.m_status = "DENIED";
 		await prisma.item.updateMany({
 			where: {
 				requestId: this.id,

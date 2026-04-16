@@ -85,8 +85,14 @@ export async function PATCH(request: Request) {
 		existingRequest.purpose = requestData.purpose;
 	}
 
-	if (requestData.status) {
-		existingRequest.status = requestData.status;
+	if (requestData.projectId) {
+		if (requestData.projectId === "") {
+			await existingRequest.removeFromProject();
+		} else {
+			if (existingRequest.projectId !== requestData.projectId) {
+				await existingRequest.setProject(requestData.projectId);
+			}
+		}
 	}
 
 	await existingRequest.save();
@@ -98,6 +104,8 @@ export async function PATCH(request: Request) {
 				name: existingRequest.name,
 				purpose: existingRequest.purpose,
 				status: existingRequest.status,
+				projectId: existingRequest.projectId,
+				totalCost: existingRequest.totalCost,
 			},
 		}),
 		{ status: 200 },
