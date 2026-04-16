@@ -44,7 +44,7 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 		<main className="p-6 flex flex-col items-center w-full">
 			<div className="flex w-1/2 items-start justify-between">
 				<h1 className="text-3xl font-bold">Request: {request.name}</h1>
-				{canEdit && (
+				{canEdit && request.status === "PENDING" && (
 					<Link href={`/requests/edit/?id=${requestId}`} className="btn btn-primary ml-4">
 						Edit Request
 					</Link>
@@ -66,7 +66,14 @@ export default async function ViewRequestPage(params: { searchParams: Promise<{ 
 					</p>
 				</div>
 
-				{canReview && <RequestApprovalButtons requestId={requestId} />}
+				<div className="mb-4">
+					<p className="text-sm opacity-70">Status</p>
+					<p className="text-base">{request.status}</p>
+				</div>
+
+				{canReview && request.status === "PENDING" && (
+					<RequestApprovalButtons requestId={requestId} />
+				)}
 
 				<StaticRequestItemsList requestId={requestId} items={items} totalItemCount={totalItems} />
 			</div>

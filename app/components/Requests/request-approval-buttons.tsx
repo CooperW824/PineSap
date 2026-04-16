@@ -1,12 +1,24 @@
 "use client";
 
+import { redirect } from "next/navigation";
+import { useState } from "react";
+
 export default function RequestApprovalButtons({ requestId }: { requestId: string }) {
+	const [error, setError] = useState<string | null>(null);
 	const handleApproval = async (approved: boolean) => {
-		await fetch(`/api/request/approval/?id=${requestId}`, {
+		const resp = await fetch(`/api/request/approval/?id=${requestId}`, {
 			method: "PATCH",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ approval: approved }),
 		});
+
+		if (!resp.ok) {
+			const data = await resp.json();
+			setError(data.error || "An error occurred while processing the approval decision.");
+		} else {
+			setError(null);
+			window.location.href = `/requests`; // Redirect to the request details page after approval decision
+		}
 	};
 
 	return (

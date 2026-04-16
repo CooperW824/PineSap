@@ -112,6 +112,8 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			quantity: item.stockQuantity,
 			description: item.description,
 			physicalLocation: item.physicalLocation,
+			placeOfPurchase: item.placeOfPurchase,
+			status: item.status,
 		}));
 	}
 
@@ -166,6 +168,8 @@ export class PersistedRequest extends DatabaseObject implements Request {
 			quantity: item.stockQuantity,
 			description: item.description,
 			physicalLocation: item.physicalLocation,
+			placeOfPurchase: item.placeOfPurchase,
+			status: item.status,
 		};
 	}
 

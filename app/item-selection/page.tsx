@@ -76,7 +76,7 @@ export default async function ItemSelectionPage({ searchParams }: ItemSelectionP
 									<h1 className="mt-2 text-3xl font-bold sm:text-4xl">{selectedItem.name}</h1>
 									<div className="mt-4 flex flex-wrap gap-3">
 										<div className="badge badge-outline badge-lg px-4 py-3 text-sm font-medium">
-											{selectedItem.physicalLocation}
+											{selectedItem.status}
 										</div>
 									</div>
 								</div>
