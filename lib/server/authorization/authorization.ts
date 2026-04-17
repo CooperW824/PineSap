@@ -13,4 +13,9 @@ export class Authorizer {
   requests(): policies.RequestPolicy {
     return new policies.RequestPolicy(this.user);
   }
+
+  items(): policies.ItemPolicy {
+	  return new policies.ItemPolicy(this.user);
+  }
+
 }
