@@ -18,12 +18,12 @@ export default async function Home() {
 			</div>
 
 			<div className="w-full max-w-4xl space-y-8">
-				<section className="flex flex-col gap-2">
+				{/* <section className="flex flex-col gap-2">
 					<label htmlFor="project-select" className="text-sm font-semibold opacity-70 ml-1">
 						Project Name
 					</label>
 					{/* FIX PROJECT SELECT FOR BETA RELEASE */}
-					<select
+					{/* <select
 						id="project-select"
 						className="select select-bordered w-full max-w-xs bg-base-200"
 						defaultValue="Project A"
@@ -31,8 +31,8 @@ export default async function Home() {
 						<option>Project A</option>
 						<option>Project B</option>
 						<option>Project C</option>
-					</select>
-				</section>
+					</select> */}
+				{/* </section> */}
 
 				<section className="space-y-4 w-full">
 					<h2 className="text-lg font-semibold">All Items</h2>

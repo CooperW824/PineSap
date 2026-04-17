@@ -13,4 +13,8 @@ export class Authorizer {
   requests(): policies.RequestPolicy {
     return new policies.RequestPolicy(this.user);
   }
+
+  budget(): policies.BudgetManagementPolicy {
+    return new policies.BudgetManagementPolicy(this.user);
+  }
 }
