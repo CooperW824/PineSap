@@ -75,7 +75,6 @@ function EditableTextArea({
 	);
 }
 
-
 // auto saver progress
 function SaveStatus({ state }: { state: SaveState }) {
 	if (state === "saving") {
@@ -105,11 +104,7 @@ function SaveStatus({ state }: { state: SaveState }) {
 		);
 	}
 
-	return (
-		<div className="badge badge-outline px-4 py-3">
-			All changes saved
-		</div>
-	);
+	return <div className="badge badge-outline px-4 py-3">All changes saved</div>;
 }
 
 export default function ItemEditor() {
@@ -195,6 +190,13 @@ export default function ItemEditor() {
 
 						<section className="rounded-2xl border border-base-300 bg-base-200/60 p-4 sm:p-6">
 							<div className="grid gap-6 lg:grid-cols-2">
+								<EditableField
+									label="Item Name"
+									defaultValue={item.name}
+									onBlur={(value) => saveField("name", value)}
+									className="lg:col-span-2"
+								/>
+
 								<EditableTextArea
 									label="Description of Item"
 									defaultValue={item.description ?? ""}
@@ -226,13 +228,6 @@ export default function ItemEditor() {
 									label="Location"
 									defaultValue={item.physicalLocation ?? ""}
 									onBlur={(value) => saveField("physicalLocation", value)}
-								/>
-
-								<EditableField
-									label="Item Name"
-									defaultValue={item.name}
-									onBlur={(value) => saveField("name", value)}
-									className="lg:col-span-2"
 								/>
 							</div>
 						</section>

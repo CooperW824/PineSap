@@ -14,66 +14,71 @@ export async function GET(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
 	if (!session) {
-		return Response.json({ error: "Unauthorized" }, { status: 401 });
+		return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 	}
 
 	const user = await PersistedUser.getById(session.user.id);
 	const authorizer = new Authorizer(user!);
 
 	if (!authorizer.items().canEdit()) {
-		return Response.json({ error: "Forbidden" }, { status: 403 });
+		return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
 	}
-	
 
 	const itemId = new URL(request.url).searchParams.get("id");
 
 	if (!itemId) {
-		return Response.json({ error: "Item ID required" }, { status: 400 });
+		return new Response(JSON.stringify({ error: "Item ID required" }), { status: 400 });
 	}
 
 	const item = await PersistedItem.getById(itemId);
 
 	if (!item) {
-		return Response.json({ error: "Item not found" }, { status: 404 });
+		return new Response(JSON.stringify({ error: "Item not found" }), { status: 404 });
 	}
 
-	return Response.json({
-		item: {
-			id: item.id,
-			name: item.name,
-			description: item.description,
-			price: item.price,
-			quantity: item.quantity,
-			physicalLocation: item.physicalLocation,
-			placeOfPurchase: item.placeOfPurchase,
+	return new Response(
+		JSON.stringify({
+			item: {
+				id: item.id,
+				name: item.name,
+				description: item.description,
+				price: item.price,
+				quantity: item.quantity,
+				physicalLocation: item.physicalLocation,
+				placeOfPurchase: item.placeOfPurchase,
+			},
+		}),
+		{
+			status: 200,
+			headers: { "Content-Type": "application/json" },
 		},
-	});
+	);
 }
 
 export async function PATCH(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
 	if (!session) {
-		return Response.json({ error: "Unauthorized" }, { status: 401 });
+		return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 	}
 
 	const user = await PersistedUser.getById(session.user.id);
 	const authorizer = new Authorizer(user!);
 
 	if (!authorizer.items().canEdit()) {
-		return Response.json({ error: "Forbidden" }, { status: 403 });
+		return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
 	}
 
 	const itemId = new URL(request.url).searchParams.get("id");
 
 	if (!itemId) {
-		return Response.json({ error: "Item ID required" }, { status: 400 });
+		return new Response(JSON.stringify({ error: "Item ID required" }), { status: 400 });
 	}
 
 	const item = await PersistedItem.getById(itemId);
 
 	if (!item) {
-		return Response.json({ error: "Item not found" }, { status: 404 });
+		return new Response(JSON.stringify({ error: "Item not found" }), { status: 404 });
 	}
 
 	const body = await request.json();
@@ -83,10 +88,34 @@ export async function PATCH(request: Request) {
 	if (body.quantity !== undefined) item.quantity = body.quantity;
 	if (body.price !== undefined) item.price = body.price;
 	if (body.placeOfPurchase !== undefined) item.placeOfPurchase = body.placeOfPurchase;
-	if (body.physicalLocation !== undefined)
-		item.physicalLocation = body.physicalLocation;
+	if (body.physicalLocation !== undefined) item.physicalLocation = body.physicalLocation;
 
 	await item.save();
 
-	return Response.json({ success: true, item });
+	return new Response(JSON.stringify({ success: true, item }), {
+		status: 200,
+		headers: { "Content-Type": "application/json" },
+	});
+}
+
+export async function POST(request: Request) {
+	const session = await auth.api.getSession({ headers: await headers() });
+
+	if (!session) {
+		return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+	}
+
+	const user = await PersistedUser.getById(session.user.id);
+	const authorizer = new Authorizer(user!);
+
+	if (!authorizer.items().canCreate()) {
+		return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+	}
+
+	const item = await PersistedItem.create();
+
+	return new Response(JSON.stringify({ item: { id: item.id } }), {
+		status: 201,
+		headers: { "Content-Type": "application/json" },
+	});
 }

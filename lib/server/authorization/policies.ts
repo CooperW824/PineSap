@@ -71,4 +71,8 @@ export class ItemPolicy {
 	canEdit(): boolean {
 		return hasAccess(this.user, "admin");
 	}
+
+	canCreate(): boolean {
+		return hasAccess(this.user, "admin");
+	}
 }
