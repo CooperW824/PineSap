@@ -17,4 +17,9 @@ export class Authorizer {
   budget(): policies.BudgetManagementPolicy {
     return new policies.BudgetManagementPolicy(this.user);
   }
+  
+  items(): policies.ItemPolicy {
+	  return new policies.ItemPolicy(this.user);
+  }
+
 }

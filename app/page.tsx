@@ -2,6 +2,11 @@ import { Filter, Search } from "lucide-react";
 import { PersistedItem } from "@/lib/server/DatabaseModels/item";
 
 import ItemList from "./components/item-list";
+import NewItemButton from "./components/Inventory/new-item-btn";
+import { auth } from "@/lib/server/auth";
+import { headers } from "next/headers";
+import { PersistedUser } from "@/lib/server/DatabaseModels/user";
+import { Authorizer } from "@/lib/server/authorization/authorization";
 
 // added async so we can await the fetch of inventory items, not sure if this is the best way but It works
 export default async function Home() {
@@ -11,10 +16,17 @@ export default async function Home() {
 	);
 	const count = await PersistedItem.count();
 
+	const session = await auth.api.getSession({ headers: await headers() });
+
+	const user = session ? await PersistedUser.getById(session.user.id) : null;
+
+	const canCreate = user ? new Authorizer(user).items().canCreate() : false;
+
 	return (
 		<main className="min-h-screen w-full p-6 bg-base-100 text-base-content flex flex-col items-center">
-			<div className="w-full max-w-4xl mb-8">
+			<div className="w-full max-w-4xl mb-8 flex items-center justify-between">
 				<h1 className="text-3xl font-bold">Inventory</h1>
+				{canCreate && <NewItemButton />}
 			</div>
 
 			<div className="w-full max-w-4xl space-y-8">
