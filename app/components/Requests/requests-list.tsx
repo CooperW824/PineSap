@@ -32,15 +32,15 @@ export default function RequestsList({
 
 
 	return (
-		<div className="space-y-3 w-3/4">
+		<div className="space-y-3 w-1/2">
 			{paginatedRequests.map((request) => (
-				<Link key={request.id} href="/requests/view" className="block">
+				<Link key={request.id} href={`/requests/view?id=${request.id}`} className="block">
 					<div className="card bg-base-200 shadow p-8 cursor-pointer hover:shadow-lg hover:bg-base-300 transition-colors">
 						<div className="flex justify-between">
 							<div>
 								<p className="font-bold">Name: {request.name || "Untitled Request"}</p>
 								<p>Status: {request.status}</p>
-								<p>Purpose: {request.purpose || "No purpose provided"}</p>
+								<p className="text-wrap">Purpose: {request.purpose || "No purpose provided"}</p>
 							</div>
 
 							<div className="text-right">

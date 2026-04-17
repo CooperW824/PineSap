@@ -1,97 +1,87 @@
+import BackButton from "@/app/components/back-button";
+import StaticRequestItemsList from "@/app/components/Requests/Items/static-items-list";
+import RequestApprovalButtons from "@/app/components/Requests/request-approval-buttons";
+import { auth } from "@/lib/server/auth";
+import { Authorizer } from "@/lib/server/authorization/authorization";
+import { PersistedProject } from "@/lib/server/DatabaseModels/project";
+import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
+import { PersistedUser } from "@/lib/server/DatabaseModels/user";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-// sample items, delete later
-const sampleItems = [
-  {
-    name: "Rocket Fuel ",
-    description: "Stolen Nasa Rocket Fuel (very strong and dangerous)",
-    price: "980,000",
-    quantity: "45",
-  },
-  {
-    name: "hamburgers ( no cheese) ",
-    description: "i'm hungry",
-    price: "15.00",
-    quantity: "10",
-  },
-]
+export default async function ViewRequestPage(params: { searchParams: Promise<{ id: string }> }) {
+	const session = await auth.api.getSession({ headers: await headers() });
 
-export default function ViewRequestPage() {
-  return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold">View Request</h1>
+	if (!session) {
+		redirect("/not-found");
+	}
 
-      <div className="mt-6 space-y-6">
+	const user = await PersistedUser.getById(session.user.id);
+	const authorizer = new Authorizer(user!);
 
-        {/* project */}
-        <div>
-          <p className="text-sm opacity-70">Project</p>
-          <p className="text-lg font-semibold">Rocket Club</p>
-        </div>
+	if (!authorizer.requests().canView()) {
+		redirect("/not-found");
+	}
 
-        {/* purpose*/}
-        <div>
-          <p className="text-sm opacity-70">Purpose</p>
-          <p className="text-base">
-            We need this very desperately pls pls pls
-          </p>
-        </div>
+	const requestId = (await params.searchParams).id;
+	const request = await PersistedRequest.getById(requestId);
 
-        {/* items */}
-        <div className="rounded-2xl bg-base-200 p-6 space-y-4">
+	if (!request) {
+		redirect("/not-found");
+	}
 
-          {/* header */}
-          <h2 className="text-xl font-bold">Items</h2>
+	const items = await request.getItems(1, 10); // Fetch first page of items for the request
+	const totalItems = await request.countItems();
 
-          {/* items list */}
-          <div className="space-y-3">
-            {sampleItems.map((item) => (
-              <div
-                key={item.name}
-                className="card bg-base-100 shadow p-4"
-              >
-                <div className="flex justify-between items-center">
+	const canEdit = authorizer.requests().canEdit((await PersistedUser.getById(request.ownerId))!);
 
-                  {/* LEFT SIDE */}
-                  <div>
-                    <p className="font-bold">{item.name}</p>
-                    <p className="text-sm opacity-70">
-                      {item.description}
-                    </p>
-                    <p>Total Price: {item.price}</p>
-                    <p>Quantity: {item.quantity}</p>
-                  </div>
+	const project = await PersistedProject.getById(request.projectId || ""); // Fetch the project associated with the request, if any
+	const projectApprovers = project ? (await project.listApprovers()).map((user) => user.email) : [];
 
-                </div>
-              </div>
-            ))}
-          </div>
+	const canReview = authorizer.requests().canReview(projectApprovers);
 
-        </div>
+	return (
+		<main className="p-6 flex flex-col items-center w-full">
+			<div className="flex w-1/2 items-start justify-between">
+				<h1 className="text-3xl font-bold">Request: {request.name}</h1>
+				{canEdit && request.status !== "APPROVED" && (
+					<Link href={`/requests/edit/?id=${requestId}`} className="btn btn-primary ml-4">
+						Edit Request
+					</Link>
+				)}
+			</div>
 
-        {/* sensibily sized buttons 
-        <div className="flex gap-10">
-          <button className="btn btn-success">
-            Approve
-          </button>
+			<div className="w-1/2 my-2">
+				<BackButton href="/requests" />
+			</div>
 
-          <button className="btn btn-error">
-            Deny
-          </button>
-        </div>
-            */}
+			<div className="w-1/2">
+				{/* project */}
+				<div>
+					<p className="text-sm opacity-70">Project</p>
+					<p className="text-lg font-semibold">{project ? project.name : "No project assigned"}</p>
+				</div>
 
-      {/* comicall large buttons */}
-      <div className="flex gap-4 mt-6">
-        <button className="btn btn-success w-1/2 h-32 text-xl">
-          Approve
-        </button>
+				{/* purpose*/}
+				<div className="mb-4">
+					<p className="text-sm opacity-70">Purpose</p>
+					<p className="text-base">
+						{request.purpose !== "" ? request.purpose : "No purpose provided"}
+					</p>
+				</div>
 
-        <button className="btn btn-error w-1/2 h-32 text-xl">
-          Deny
-        </button>
-      </div>
-          
-      </div>
-    </main>
-  )
+				<div className="mb-4">
+					<p className="text-sm opacity-70">Status</p>
+					<p className="text-base">{request.status}</p>
+				</div>
+
+				{canReview && request.status === "PENDING" && (
+					<RequestApprovalButtons requestId={requestId} />
+				)}
+
+				<StaticRequestItemsList requestId={requestId} items={items} totalItemCount={totalItems} />
+			</div>
+		</main>
+	);
 }

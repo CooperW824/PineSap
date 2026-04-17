@@ -31,6 +31,7 @@ export default function ItemBox({ item }: ItemBoxProps) {
 					<div className="flex flex-col text-right shrink-0">
 						<p className="font-semibold text-[15px] m-0 leading-tight">{item.physicalLocation}</p>
 						<p className="text-[13px] opacity-70 mt-1 m-0 leading-tight">Qty: {item.quantity}</p>
+						<p className="text-[13px] opacity-70 mt-1 m-0 leading-tight"> Status: {item.status}</p>
 					</div>
 				</div>
 			</div>

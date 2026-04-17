@@ -1,9 +1,9 @@
 "use client";
 
 import { ItemData } from "@/lib/server/DatabaseModels/item";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PaginationControls from "../../pagination-controls";
-import ItemCard from "./item-card";
+import ItemCard from "./editable-item-card";
 
 export default function RequestItemsList({
 	requestId,
@@ -19,22 +19,6 @@ export default function RequestItemsList({
 	const [currentPage, setCurrentPage] = useState(totalItemCount > 0 ? 1 : 0);
 	const [itemCount, setItemCount] = useState(totalItemCount);
 	const itemsPerPage = 10;
-
-	useEffect(() => {
-		const fetchItems = async () => {
-			const resp = await fetch(
-				`/api/request/items/?id=${requestId}&page=${currentPage}&limit=${itemsPerPage}`,
-			);
-			if (resp.ok) {
-				const data = await resp.json();
-				setRequestItems(data.items);
-			} else {
-				setError("Failed to fetch request items");
-			}
-		};
-
-		fetchItems();
-	}, [requestId, currentPage]);
 
 	const onPageChange = async (newPage: number) => {
 		const resp = await fetch(

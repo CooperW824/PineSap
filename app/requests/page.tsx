@@ -31,7 +31,7 @@ export default async function RequestsPage() {
 
 	return (
 		<main className="p-6 flex flex-col w-full justify-start items-center">
-			<div className="flex justify-between items-center mb-4 w-3/4">
+			<div className="flex justify-between items-center mb-4 w-1/2">
 				<h1 className="text-3xl font-bold">Requests</h1>
 				{canSubmit && <CreateRequestButton />}
 			</div>
