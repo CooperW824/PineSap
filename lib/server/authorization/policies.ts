@@ -62,6 +62,11 @@ export class UserManagementPolicy {
 }
 
 export class BudgetManagementPolicy {
+	private user: User;
+
+	constructor(user: User) {
+		this.user = user;
+	}
 
 	canView(): boolean {
 		return hasAccess(this.user, "member");
@@ -70,7 +75,6 @@ export class BudgetManagementPolicy {
 	canUpdate(): boolean {
 		return hasAccess(this.user, "admin");
 	}
-  
 }
 
 export class ItemPolicy {
@@ -79,8 +83,8 @@ export class ItemPolicy {
 	constructor(user: User) {
 		this.user = user;
 	}
-  
-  canEdit(): boolean {
+
+	canEdit(): boolean {
 		return hasAccess(this.user, "admin");
 	}
 

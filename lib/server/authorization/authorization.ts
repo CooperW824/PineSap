@@ -6,6 +6,7 @@ export class Authorizer {
   constructor(user: User) {
     this.user = user;
   }
+  
   users(): policies.UserManagementPolicy {
     return new policies.UserManagementPolicy(this.user);
   }
