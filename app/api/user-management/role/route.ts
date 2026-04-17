@@ -2,6 +2,16 @@ import { auth } from "@/lib/server/auth";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 
+/**
+ * PATCH /api/user-management/role
+ * Changes a user's role. Requires the caller to have permission to change roles.
+ * 
+ * Request Body:    
+ * - userId: the ID of the user to change the role of
+ * - role: the new role to assign to the user
+ * @param request The HTTP Request
+ * @returns {user: {id: string, email: string, name: string, role: Role}} The updated user details if successful, or an error message if not
+ */
 export async function PATCH(request: Request) {
     const callerSession = await auth.api.getSession({ headers: request.headers });
 

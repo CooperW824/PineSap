@@ -4,6 +4,18 @@ import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { headers } from "next/headers";
 
+/**
+ * GET /api/requests?limit=10&page=1
+ *
+ * Returns a paginated list of all requests with their details. Requires the user to have permission to view requests.
+ *
+ * Query Parameters:
+ * - page: the page number to retrieve (default: 1)
+ * - limit: the number of requests per page (default: 10)
+ *
+ * @param request The HTTP Request
+ * @returns {requests: RequestData[], totalCount: number} A paginated list of all requests with their details, and the total count of requests in the system
+ */
 export async function GET(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 

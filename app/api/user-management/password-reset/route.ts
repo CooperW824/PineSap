@@ -2,6 +2,17 @@ import { auth } from "@/lib/server/auth";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 
+/**
+ * PATCH /api/user-management/password-reset
+ *  
+ * Sends a password reset email to the specified user. Requires the caller to have permission to reset passwords.
+ * 
+ * Request Body:
+ * - userId: the ID of the user to send the password reset email to
+ * 
+ * @param request The HTTP Request
+ * @returns {message: string} A success message if the email was sent, or an error message if it was not
+ */
 export async function PATCH(request: Request) {
   const callerSession = await auth.api.getSession({ headers: request.headers });
 
