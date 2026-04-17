@@ -7,6 +7,7 @@ import { auth } from "@/lib/server/auth";
 import { headers } from "next/headers";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { Authorizer } from "@/lib/server/authorization/authorization";
+import Link from "next/link";
 // end remove section
 
 const detailCardClassName = "rounded-2xl border border-base-300 bg-base-100 px-4 py-4 shadow-sm";

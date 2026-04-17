@@ -1,6 +1,5 @@
 "use client";
 
-import { set } from "better-auth";
 import { useState } from "react";
 
 export default function PaginationControls({

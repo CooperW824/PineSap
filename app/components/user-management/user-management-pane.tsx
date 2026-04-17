@@ -6,7 +6,6 @@ import { useState } from "react";
 import UserCard from "./user-card";
 import PaginationControls from "../pagination-controls";
 import Modal from "../Modal";
-import { set } from "better-auth";
 
 export default function UserManagementPane({
   users,

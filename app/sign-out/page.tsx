@@ -11,7 +11,7 @@ export default function SignOutPage() {
       router.refresh(); // re-fetches all server components including navbar
       router.push("/");
     });
-  }, []);
+  }, [router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 w-full">

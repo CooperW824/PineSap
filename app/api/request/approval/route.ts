@@ -45,7 +45,7 @@ export async function PATCH(request: Request) {
 		});
 	}
 
-	const approval = (await request.json()).approval as Boolean | undefined;
+	const approval = (await request.json()).approval as boolean | undefined;
 
 	if (approval === undefined) {
 		return new Response(

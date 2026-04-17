@@ -13,7 +13,7 @@ export default function RequestDecriptionEdit({ description, requestId }: { desc
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ purpose: requestDescription }),
-        }).catch((err) => {
+        }).catch(() => {
             setError("Failed to update request description");
         });
     };

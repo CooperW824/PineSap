@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Plus, RotateCcw, Trash2, UserRound } from "lucide-react";
+import { RotateCcw, Trash2, UserRound } from "lucide-react";
 import { UserData } from "@/lib/server/DatabaseModels/user";
 
 export default function UserCard({
