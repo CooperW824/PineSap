@@ -37,8 +37,6 @@ export default function PasswordInput({
           required
           placeholder={placeholder}
           minLength={8}
-          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-          title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
           disabled={disabled}
           onChange={(e) => onChange?.(e.target.value)}
         />
@@ -65,13 +63,6 @@ export default function PasswordInput({
           </svg>
         </button>
       </label>
-      <p className="validator-hint hidden">
-        Must be more than 8 characters, including
-        <br />
-        At least one number <br />
-        At least one lowercase letter <br />
-        At least one uppercase letter
-      </p>
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { ItemStatus } from "@/generated/prisma/enums";
 import prisma from "../prisma"; //fixed the import, was wrong
 import { DatabaseObject } from "./database-object";
 
@@ -9,6 +10,7 @@ export type ItemData = {
 	description?: string | null;
 	physicalLocation?: string | null;
 	placeOfPurchase?: string | null;
+	status: ItemStatus;
 };
 
 export interface Item {
@@ -20,6 +22,7 @@ export interface Item {
 	get description(): string | null;
 	get physicalLocation(): string | null;
 	get placeOfPurchase(): string | null;
+	get status(): ItemStatus;
 
 	set name(newName: string);
 	set price(newPrice: number);
@@ -27,6 +30,7 @@ export interface Item {
 	set description(newDescription: string | null);
 	set physicalLocation(newPhysicalLocation: string | null);
 	set placeOfPurchase(newPlaceOfPurchase: string | null);
+	set status(newStatus: ItemStatus);
 }
 
 // Class for items in the DB
@@ -41,6 +45,7 @@ export class PersistedItem extends DatabaseObject {
 	m_description?: string;
 	m_physicalLocation?: string;
 	m_placeOfPurchase?: string;
+	m_status: ItemStatus;
 
 	/// Constructor
 	protected constructor(data: ItemData & { createdAt: Date }) {
@@ -52,6 +57,7 @@ export class PersistedItem extends DatabaseObject {
 		this.m_description = data.description || undefined;
 		this.m_physicalLocation = data.physicalLocation || undefined;
 		this.m_placeOfPurchase = data.placeOfPurchase || undefined;
+		this.m_status = data.status;
 	}
 
 	// do we delete this function now? since fromID does basically the same thing.
@@ -72,6 +78,7 @@ export class PersistedItem extends DatabaseObject {
 			description: item.description ?? undefined,
 			physicalLocation: item.physicalLocation ?? undefined,
 			placeOfPurchase: item.placeOfPurchase ?? undefined,
+			status: item.status,
 		});
 	}
 
@@ -81,6 +88,7 @@ export class PersistedItem extends DatabaseObject {
 			data: {
 				name: "", // placeholder
 				price: 0, // placeholder
+				status: "PENDING_APPROVAL", // default status for new items
 			},
 		});
 
@@ -143,6 +151,14 @@ export class PersistedItem extends DatabaseObject {
 		this.m_placeOfPurchase = newPlaceOfPurchase ?? undefined;
 	}
 
+	get status(): ItemStatus {
+		return this.m_status;
+	}
+
+	set status(newStatus: ItemStatus) {
+		this.m_status = newStatus;
+	}
+
 	// special functions
 
 	// -- INVENTORY FUNCTIONS --
@@ -165,6 +181,7 @@ export class PersistedItem extends DatabaseObject {
 			description: item.description ?? undefined,
 			physicalLocation: item.physicalLocation ?? undefined,
 			placeOfPurchase: item.placeOfPurchase ?? undefined,
+			status: item.status,
 		}));
 	}
 
