@@ -4,7 +4,19 @@ import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { PersistedItem } from "@/lib/server/DatabaseModels/item";
 import { headers } from "next/headers";
+import { it } from "node:test";
 
+/**
+ * GET /api/items?id=itemId
+ *
+ * Returns the details of a specific inventory item. Requires the user to have permission to edit items.
+ *
+ * Query Parameters:
+ * - id: the ID of the item to retrieve
+ *
+ * @param request The HTTP Request
+ * @returns {item: ItemData} The details of the requested item
+ */
 export async function GET(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -57,6 +69,25 @@ export async function GET(request: Request) {
 	);
 }
 
+/**
+ * POST /api/items?id=itemId
+ *
+ * Creates a new empty inventory item. Requires the user to have permission to edit requests.
+ *
+ * Query Parameters:
+ * - id: the ID of the item to update
+ *
+ * Request Body:
+ * - name: the new name of the item (optional)
+ * - price: the new price of the item (optional)
+ * - quantity: the new quantity of the item (optional)
+ * - description: the new description of the item (optional)
+ * - physicalLocation: the new physical location of the item (optional)
+ * - placeOfPurchase: the new place of purchase for the item (optional)
+ *
+ * @param request The HTTP Request
+ * @returns {item: ItemData} The updated item details if successful, or an error message if the update failed
+ */
 export async function POST(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -100,6 +131,7 @@ export async function POST(request: Request) {
 		quantity: 1,
 		description: "",
 		placeOfPurchase: "",
+		status: "PENDING_APPROVAL",
 	});
 
 	return new Response(
@@ -110,6 +142,25 @@ export async function POST(request: Request) {
 	);
 }
 
+/**
+ * PATCH /api/items?id=itemId
+ *
+ * Updates the details of an inventory item. Will also update the request's total cost if the price or quantity is changed.
+ * Requires the user to have permission to edit requests.
+ *
+ * Query Parameters:
+ * - id: the ID of the item to update
+ *
+ * Request Body:
+ * - name: (optional) the new name of the item
+ * - description: (optional) the new description of the item
+ * - price: (optional) the new price of the item
+ * - quantity: (optional) the new quantity of the item
+ * - placeOfPurchase: (optional) the new place of purchase for the item
+ *
+ * @param request The HTTP Request
+ * @returns {item: ItemData} The updated item details if successful, or an error message if not
+ */
 export async function PATCH(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -162,7 +213,6 @@ export async function PATCH(request: Request) {
 		});
 	}
 
-
 	if (itemData.name) {
 		item.name = itemData.name;
 	}
@@ -175,7 +225,9 @@ export async function PATCH(request: Request) {
 	}
 
 	if (itemData.quantity) {
+		existingRequest.totalCost += itemData.price * itemData.quantity - item.price * item.quantity;
 		item.quantity = itemData.quantity;
+		await existingRequest.save();
 	}
 
 	if (itemData.description) {

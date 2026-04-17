@@ -4,6 +4,14 @@ import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { PersistedProject } from "@/lib/server/DatabaseModels/project";
 import { Authorizer } from "@/lib/server/authorization/authorization";
 
+/**
+ * GET /api/projects
+ *
+ * Returns a list of all projects with their budgets and approvers. Requires the user to have permission to view users.
+ *
+ * @param request The HTTP Request
+ * @returns {projects: {id: string, name: string, budget: number, reviewers: string[]}[]} A list of all projects with their budgets and approvers
+ */
 export async function GET() {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -35,6 +43,14 @@ export async function GET() {
 	return Response.json({ projects: hydratedProjects });
 }
 
+
+/** * POST /api/projects
+ *
+ * Creates a new project. Requires the user to have permission to create users.
+ *
+ * @param request The HTTP Request
+ * @returns {project: {id: string, name: string, budget: number, reviewers: string[]}} The newly created project with its details, or an error message if creation failed
+ */
 export async function POST(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -70,6 +86,18 @@ export async function POST(request: Request) {
 	});
 }
 
+/**
+ * PATCH /api/projects
+ *
+ * Adds an approver to a project. Requires the user to have permission to create users.
+ * 
+ * Request Body:
+ * - projectId: the ID of the project to update
+ * - email: the email of the user to add as an approver
+ *
+ * @param request The HTTP Request
+ * @returns {project: {id: string, name: string, budget: number, reviewers: string[]}} The updated project with its details, or an error message if the update failed
+ */
 export async function PATCH(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -110,9 +138,20 @@ export async function PATCH(request: Request) {
 			reviewers: reviewers.map((u) => u.email),
 		},
 	});
-	
 }
 
+/**
+ * DELETE /api/projects
+ *
+ * Removes an approver from a project. Requires the user to have permission to create users.
+ * 
+ * Request Body:
+ * - projectId: the ID of the project to update
+ * - email: the email of the user to remove as an approver
+ *
+ * @param request The HTTP Request
+ * @returns {project: {id: string, name: string, budget: number, reviewers: string[]}} The updated project with its details, or an error message if the update failed
+ */
 export async function DELETE(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 

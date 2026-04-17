@@ -9,7 +9,17 @@ import { PersistedItem } from "@/lib/server/DatabaseModels/item";
    clear. But for now that's just where I put it.
 */
 
-// stole most of this from cooper's API auth stuff
+/**
+ * GET /api/items?id=itemId
+ *
+ * Returns the details of a specific inventory item. Requires the user to have permission to edit items.
+ * 
+ * Query Parameters:
+ * - id: the ID of the item to retrieve
+ *
+ * @param request The HTTP Request
+ * @returns {item: ItemData} The details of the requested item
+ */
 export async function GET(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
@@ -20,7 +30,7 @@ export async function GET(request: Request) {
 	const user = await PersistedUser.getById(session.user.id);
 	const authorizer = new Authorizer(user!);
 
-	if (!authorizer.items().canEdit()) {
+	if (!authorizer.items().canEdit()) {``
 		return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
 	}
 
@@ -54,6 +64,26 @@ export async function GET(request: Request) {
 		},
 	);
 }
+
+/**
+ * PATCH /api/items?id=itemId
+ *
+ * Updates the details of a specific inventory item. Requires the user to have permission to edit items.
+ * 
+ * Query Parameters:
+ * - id: the ID of the item to update
+ *
+ * Request Body:
+ * - name: (optional) the new name of the item
+ * - description: (optional) the new description of the item
+ * - price: (optional) the new price of the item
+ * - quantity: (optional) the new quantity of the item
+ * - physicalLocation: (optional) the new physical location of the item
+ * - placeOfPurchase: (optional) the new place of purchase for the item
+ *
+ * @param request The HTTP Request
+ * @returns {success: boolean, item: ItemData} The updated item details if successful, or an error message if not
+ */
 
 export async function PATCH(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
@@ -98,6 +128,14 @@ export async function PATCH(request: Request) {
 	});
 }
 
+/**
+ * POST /api/items
+ *
+ * Creates a new inventory item with default values. Requires the user to have permission to create items.
+ *
+ * @param request The HTTP Request
+ * @returns {item: {id: string}} The ID of the newly created item if successful, or an error message if not
+ */
 export async function POST(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 

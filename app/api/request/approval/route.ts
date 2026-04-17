@@ -5,6 +5,20 @@ import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { headers } from "next/headers";
 
+/**
+ * PATCH /api/request/approval?id=requestId
+ *
+ * Approves or denies a request based on the approval decision provided in the request body. Requires the user to have permission to review requests for the associated project.
+ *
+ * Query Parameters:
+ * - id: the ID of the request to approve or deny
+ *
+ * Request Body:
+ * - approval: boolean value indicating whether to approve (true) or deny (false) the request
+ *
+ * @param request The HTTP Request
+ * @returns {request: {id: string, status: string}} The updated request with its new status, or an error message if the operation failed
+ */
 export async function PATCH(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 

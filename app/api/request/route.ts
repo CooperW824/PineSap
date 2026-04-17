@@ -4,7 +4,15 @@ import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { headers } from "next/headers";
 
-export async function POST(request: Request) {
+/**
+ * POST /api/request
+ *
+ * Creates a new request with default values. Requires the user to have permission to create requests.
+ *
+ * @param request The HTTP Request
+ * @returns {request: {id: string, name: string, purpose: string | null, status: RequestStatus}} The details of the newly created request if successful, or an error message if not
+ */
+export async function POST(_: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
 
 	if (!session) {
@@ -37,6 +45,23 @@ export async function POST(request: Request) {
 		{ status: 201 },
 	);
 }
+
+/** 
+ * PATCH /api/request?id=requestId
+ * 
+ * Updates the details of a request. Requires the user to have permission to edit requests.
+ * 
+ * Query Parameters:
+ * - id: the ID of the request to update
+ *
+ * Request Body:
+ * - name: (optional) the new name of the request
+ * - purpose: (optional) the new purpose of the request
+ * - projectId: (optional) the ID of the project to associate with the request, or null to remove from project
+ * - status: (optional) if set to "PENDING", will submit the request for approval
+ * 
+ * @returns {request: RequestData} The updated request details if successful, or an error message if not
+ */
 
 export async function PATCH(request: Request) {
 	const session = await auth.api.getSession({ headers: await headers() });
