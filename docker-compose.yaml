@@ -1,32 +1,64 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+  apache:
+    image: httpd:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./apache/vhost.conf:/usr/local/apache2/conf/extra/vhost.conf
+      - certbot_www:/var/www/certbot # ACME challenge webroot
+      - certbot_certs:/etc/letsencrypt # shared cert volume
+    depends_on:
+      - nextjs
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    entrypoint: >
+      sh -c "certbot certonly --webroot -w /var/www/certbot
+      -d <YOUR_DOMAIN> 
+      --email <YOUR_EMAIL>
+      --agree-tos
+      --non-interactive
+      && while true; do sleep 12h; certbot renew --quiet; done"
+
+  nextjs:
+    image: ghcr.io/<GITHUB_USERNAME>/pinesap:latest
+    restart: unless-stopped
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET}"
       BETTER_AUTH_URL: "${BETTER_AUTH_URL}"
       NEXT_PUBLIC_BETTER_AUTH_URL: "${BETTER_AUTH_URL}"
       AUTH_GMAIL_EMAIL: "${AUTH_GMAIL_EMAIL}"
       AUTH_GMAIL_PASSWORD: "${AUTH_GMAIL_PASSWORD}"
       NEXT_PUBLIC_ITEMS_PER_PAGE: "${NEXT_PUBLIC_ITEMS_PER_PAGE}"
-    ports:
-      - "3000:3000"
     depends_on:
-      - database
-  database:
+      postgres:
+        condition: service_healthy
+
+  postgres:
     image: postgres:18
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_INITDB_ARGS=--auth-host=md5 --auth-local=md5
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pinesap"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
+  certbot_www:
+  certbot_certs:
