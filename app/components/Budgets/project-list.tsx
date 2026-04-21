@@ -5,7 +5,6 @@ import { useState } from "react";
 import { ProjectData } from "@/lib/server/DatabaseModels/project";
 import PaginationControls from "../pagination-controls";
 import Modal from "../Modal";
-
 export default function ProjectList({
 	projects,
 	totalCount,
@@ -19,8 +18,8 @@ export default function ProjectList({
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const itemsPerPage = 10;
 	const totalPages = Math.ceil(totalCount / itemsPerPage);
-	const [budgetModalOpen, setBudgetModalOpen] = useState(false);
 	const [budgetUpdateError, setBudgetUpdateError] = useState<string | null>(null);
+	const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
 	const [unsavedBudget, setUnsavedBudget] = useState<number>(0);
 
 	const handlePageChange = async (newPage: number) => {
@@ -36,7 +35,6 @@ export default function ProjectList({
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ budget: newBudget }),
 		});
-
 		if (response.ok) {
 			const updatedProject = await response.json();
 			setCurrentProjects((prevProjects) =>
@@ -44,10 +42,10 @@ export default function ProjectList({
 					proj.id === projectId ? { ...proj, budget: updatedProject.project.budget } : proj,
 				),
 			);
+			setSelectedProject(null);
 		} else {
 			setBudgetUpdateError("Failed to update budget. Please try again.");
 		}
-		setBudgetModalOpen(false);
 	};
 
 	return (
@@ -63,45 +61,50 @@ export default function ProjectList({
 							<p className="text-lg font-semibold">Budget: ${project.budget.toFixed(2)}</p>
 							<p className="text-lg font-semibold">Total Spend: ${project.totalSpend.toFixed(2)}</p>
 						</div>
-
 						{canUpdate && (
 							<button
 								type="button"
 								className="btn h-12 min-h-12 rounded-xl border-base-300 bg-base-300 px-6 text-base font-medium text-base-content shadow-none hover:bg-base-300"
 								onClick={() => {
-									setBudgetModalOpen(true);
+									setSelectedProject(project);
 									setUnsavedBudget(project.budget);
+									setBudgetUpdateError(null);
 								}}
 							>
 								Adjust Budget
 							</button>
 						)}
-						<Modal
-							open={budgetModalOpen}
-							onClose={() => setBudgetModalOpen(false)}
-							title={`Set New Budget`}
-							actions={
-								<button
-									className="btn btn-primary"
-									onClick={() => {
-										handleBudgetUpdate(project.id, unsavedBudget);
-									}}
-								>
-									Create
-								</button>
-							}
-						>
-							<input
-								type="number"
-								className="input input-bordered w-full"
-								value={unsavedBudget}
-								onChange={(e) => setUnsavedBudget(Number(e.target.value))}
-							/>
-							{budgetUpdateError && <p className="text-error mt-2">{budgetUpdateError}</p>}
-						</Modal>
 					</article>
 				))}
 			</div>
+
+			{/* Single modal rendered once, outside the map */}
+			<Modal
+				open={selectedProject !== null}
+				onClose={() => setSelectedProject(null)}
+				title="Set New Budget"
+				actions={
+					<button
+						className="btn btn-primary"
+						onClick={() => {
+							if (selectedProject) {
+								handleBudgetUpdate(selectedProject.id, unsavedBudget);
+							}
+						}}
+					>
+						Update
+					</button>
+				}
+			>
+				<input
+					type="number"
+					className="input input-bordered w-full"
+					value={unsavedBudget}
+					onChange={(e) => setUnsavedBudget(Number(e.target.value))}
+				/>
+				{budgetUpdateError && <p className="text-error mt-2">{budgetUpdateError}</p>}
+			</Modal>
+
 			<PaginationControls
 				currentPage={currentPage}
 				totalPages={totalPages}
