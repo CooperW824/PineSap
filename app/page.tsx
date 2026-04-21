@@ -35,7 +35,7 @@ export default async function Home() {
 						Project Name
 					</label>
 					{/* FIX PROJECT SELECT FOR BETA RELEASE */}
-					{/* <select
+				{/* <select
 						id="project-select"
 						className="select select-bordered w-full max-w-xs bg-base-200"
 						defaultValue="Project A"

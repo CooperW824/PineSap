@@ -46,11 +46,11 @@ export async function POST() {
 	);
 }
 
-/** 
+/**
  * PATCH /api/request?id=requestId
- * 
+ *
  * Updates the details of a request. Requires the user to have permission to edit requests.
- * 
+ *
  * Query Parameters:
  * - id: the ID of the request to update
  *
@@ -59,7 +59,7 @@ export async function POST() {
  * - purpose: (optional) the new purpose of the request
  * - projectId: (optional) the ID of the project to associate with the request, or null to remove from project
  * - status: (optional) if set to "PENDING", will submit the request for approval
- * 
+ *
  * @returns {request: RequestData} The updated request details if successful, or an error message if not
  */
 

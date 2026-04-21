@@ -43,7 +43,6 @@ export async function GET() {
 	return Response.json({ projects: hydratedProjects });
 }
 
-
 /** * POST /api/projects
  *
  * Creates a new project. Requires the user to have permission to create users.
@@ -90,7 +89,7 @@ export async function POST(request: Request) {
  * PATCH /api/projects
  *
  * Adds an approver to a project. Requires the user to have permission to create users.
- * 
+ *
  * Request Body:
  * - projectId: the ID of the project to update
  * - email: the email of the user to add as an approver
@@ -144,7 +143,7 @@ export async function PATCH(request: Request) {
  * DELETE /api/projects
  *
  * Removes an approver from a project. Requires the user to have permission to create users.
- * 
+ *
  * Request Body:
  * - projectId: the ID of the project to update
  * - email: the email of the user to remove as an approver

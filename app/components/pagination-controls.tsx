@@ -3,59 +3,59 @@
 import { useState } from "react";
 
 export default function PaginationControls({
-  currentPage,
-  totalPages,
-  onPageChange,
+	currentPage,
+	totalPages,
+	onPageChange,
 }: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+	currentPage: number;
+	totalPages: number;
+	onPageChange: (page: number) => void;
 }) {
-  const [inputValue, setInputValue] = useState(currentPage.toString());
+	const [inputValue, setInputValue] = useState(currentPage.toString());
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setInputValue(e.target.value);
+	};
 
-  const handleInputBlur = () => {
-    const desiredPage = Number(inputValue);
-    if (desiredPage >= 1 && desiredPage <= totalPages) {
-      onPageChange(desiredPage);
-    } else {
-      setInputValue(currentPage.toString());
-    }
-  };
-  return (
-    <div className="join">
-      <button
-        className="btn btn-sm btn-neutral disabled:text-base-100 enabled:text-white join-item"
-        onClick={() => {
-          onPageChange(currentPage - 1);
-          setInputValue((prev) => (Number(prev) - 1).toString());
-        }}
-        disabled={currentPage === 1 || totalPages === 0}
-      >
-        &lt;&lt;
-      </button>
-      <div className="join-item flex items-center w-fit bg-base-200 px-2">
-        <input
-          className="input input-neutral rounded-sm mx-0 w-8 h-7 bg-base-300 mr-1 text-center p-0"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputBlur}
-        />{" "}
-        <span className="text-nowrap">of {totalPages}</span>
-      </div>
-      <button
-        className="btn btn-sm btn-neutral disabled:text-base-100 enabled:text-white join-item"
-        onClick={() => {
-          onPageChange(currentPage + 1);
-          setInputValue((prev) => (Number(prev) + 1).toString());
-        }}
-        disabled={currentPage === totalPages || totalPages === 0}
-      >
-        &gt;&gt;
-      </button>
-    </div>
-  );
+	const handleInputBlur = () => {
+		const desiredPage = Number(inputValue);
+		if (desiredPage >= 1 && desiredPage <= totalPages) {
+			onPageChange(desiredPage);
+		} else {
+			setInputValue(currentPage.toString());
+		}
+	};
+	return (
+		<div className="join">
+			<button
+				className="btn btn-sm btn-neutral disabled:text-base-100 enabled:text-white join-item"
+				onClick={() => {
+					onPageChange(currentPage - 1);
+					setInputValue((prev) => (Number(prev) - 1).toString());
+				}}
+				disabled={currentPage === 1 || totalPages === 0}
+			>
+				&lt;&lt;
+			</button>
+			<div className="join-item flex items-center w-fit bg-base-200 px-2">
+				<input
+					className="input input-neutral rounded-sm mx-0 w-8 h-7 bg-base-300 mr-1 text-center p-0"
+					value={inputValue}
+					onChange={handleInputChange}
+					onBlur={handleInputBlur}
+				/>{" "}
+				<span className="text-nowrap">of {totalPages}</span>
+			</div>
+			<button
+				className="btn btn-sm btn-neutral disabled:text-base-100 enabled:text-white join-item"
+				onClick={() => {
+					onPageChange(currentPage + 1);
+					setInputValue((prev) => (Number(prev) + 1).toString());
+				}}
+				disabled={currentPage === totalPages || totalPages === 0}
+			>
+				&gt;&gt;
+			</button>
+		</div>
+	);
 }

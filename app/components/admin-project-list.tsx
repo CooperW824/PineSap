@@ -55,9 +55,7 @@ export default function AdminProjectList() {
 		const data = await response.json();
 
 		setClubProjects((prev) =>
-			prev.map((project) =>
-				project.id === activeProjectId ? data.project : project,
-			),
+			prev.map((project) => (project.id === activeProjectId ? data.project : project)),
 		);
 
 		setReviewerEmail("");
@@ -65,8 +63,7 @@ export default function AdminProjectList() {
 		setShowReviewerModal(false);
 	};
 
-	const handleRemoveReviewer = async ( projectId: string, email: string, ) => {
-		
+	const handleRemoveReviewer = async (projectId: string, email: string) => {
 		const response = await fetch("/api/projects", {
 			method: "DELETE",
 			headers: { "Content-Type": "application/json" },
@@ -81,9 +78,7 @@ export default function AdminProjectList() {
 		const data = await response.json();
 
 		setClubProjects((prev) =>
-			prev.map((project) =>
-				project.id === projectId ? data.project : project,
-			),
+			prev.map((project) => (project.id === projectId ? data.project : project)),
 		);
 	};
 
@@ -93,10 +88,7 @@ export default function AdminProjectList() {
 				<div className="flex w-full items-center justify-between">
 					<h2 className="text-lg font-semibold">Projects</h2>
 
-					<button
-						className="btn btn-primary"
-						onClick={() => setShowProjectModal(true)}
-					>
+					<button className="btn btn-primary" onClick={() => setShowProjectModal(true)}>
 						New Project
 					</button>
 				</div>
@@ -111,9 +103,7 @@ export default function AdminProjectList() {
 									setActiveProjectId(project.id);
 									setShowReviewerModal(true);
 								}}
-								onRemoveReviewer={(email) =>
-									handleRemoveReviewer(project.id, email)
-								}
+								onRemoveReviewer={(email) => handleRemoveReviewer(project.id, email)}
 							/>
 						))
 					) : (
