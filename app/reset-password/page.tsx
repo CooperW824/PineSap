@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import PasswordInput from "../components/password-input";
 import { authClient } from "@/lib/client/auth-client";
 import { redirect, useSearchParams } from "next/navigation";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
+	return (
+		<>
+			<Suspense fallback={<div>Loading...</div>}>
+				<ResetPasswordComponent />
+			</Suspense>
+		</>
+	);
+}
+
+function ResetPasswordComponent() {
+	const searchParams = useSearchParams();
 	const [error, setError] = useState<string | undefined>(undefined);
 	const [token] = useState(searchParams.get("token") || "");
 
@@ -14,7 +24,6 @@ export default function ResetPasswordPage() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 
 	const [passwordsMatch, setPasswordsMatch] = useState(true);
-
 
 	const handleResetPassword = async () => {
 		if (newPassword !== confirmPassword) {

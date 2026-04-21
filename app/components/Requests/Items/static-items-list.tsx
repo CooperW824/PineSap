@@ -45,7 +45,7 @@ export default function RequestItemsList({
 					</p>
 				</div>
 				{requestItems.map((item) => (
-					<StaticItemCard key={item.id} item={item} requestId={requestId} />
+					<StaticItemCard key={item.id} item={item} />
 				))}
 				<PaginationControls
 					currentPage={currentPage}
