@@ -26,6 +26,8 @@ FROM node:22-slim AS runner
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
+ARG NEXT_PUBLIC_BETTER_AUTH_URL
+ENV NEXT_PUBLIC_BETTER_AUTH_URL=${NEXT_PUBLIC_BETTER_AUTH_URL}
 
 # Install only production dependencies
 COPY package*.json ./
@@ -35,11 +37,14 @@ RUN apt-get update && apt-get install -y openssl
 
 
 # Copy necessary files from builder
+COPY --from=builder /usr/src/app/utils ./utils
+COPY --from=builder /usr/src/app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /usr/src/app/prisma ./prisma
 COPY --from=builder /usr/src/app/.next ./.next
 COPY --from=builder /usr/src/app/public ./public
 COPY --from=builder /usr/src/app/next.config.ts ./next.config.ts
 COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/app/generated/prisma ./generated/prisma
+COPY --from=builder /usr/src/app/generated/prisma ./generated/prisma
 
 # Expose Next.js port
 EXPOSE 3000
