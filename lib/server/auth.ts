@@ -42,4 +42,8 @@ export const auth = betterAuth({
 			adminRoles: ["admin"], // Only users with the "admin" role will have access to the admin panel and its features.
 		}),
 	], // Adding the admin plugin to manage user roles and permissions.
+	advanced: {
+		trustedProxyHeaders: true,
+	},
+	trustedOrigins: [process.env.BETTER_AUTH_URL!], // Allow CORS requests from the frontend URL
 });
