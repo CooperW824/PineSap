@@ -66,7 +66,6 @@ export default async function ItemSelectionPage({ searchParams }: ItemSelectionP
 							<BackButton />
 						</div>
 
-
 						{!selectedItem ? (
 							<section className="rounded-2xl border border-dashed border-base-300 bg-base-200/40 p-8 text-center shadow-sm">
 								<h1 className="text-3xl font-bold sm:text-4xl">No Item Selected</h1>
@@ -76,14 +75,14 @@ export default async function ItemSelectionPage({ searchParams }: ItemSelectionP
 							</section>
 						) : (
 							<>
-						{canEdit && (
-							<Link
-								href={`/item-selection/edit?itemId=${selectedItem.id}`}
-								className="btn btn-primary rounded-2xl"
-							>
-								Edit Item
-							</Link>
-						)}
+								{canEdit && (
+									<Link
+										href={`/item-selection/edit?itemId=${selectedItem.id}`}
+										className="btn btn-primary rounded-2xl"
+									>
+										Edit Item
+									</Link>
+								)}
 								<div className="max-w-4xl">
 									<p className="text-sm font-semibold uppercase tracking-[0.2em] text-base-content/55">
 										Item Details

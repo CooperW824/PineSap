@@ -13,7 +13,7 @@ export default function RequestNameEdit({ name, requestId }: { name: string; req
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({ name: requestName }),
-		}).catch((err) => {
+		}).catch(() => {
 			setError("Failed to update request name");
 		});
 	};

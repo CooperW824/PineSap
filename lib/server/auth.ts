@@ -20,7 +20,7 @@ export const auth = betterAuth({
 	baseURL: process.env.BETTER_AUTH_URL!,
 	emailAndPassword: {
 		enabled: true,
-		sendResetPassword(data, request) {
+		sendResetPassword(data) {
 			return authEmailSender.sendEmail(
 				data.user.email,
 				"PineSap Password Reset",

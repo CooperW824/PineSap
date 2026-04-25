@@ -17,6 +17,8 @@ export default function CreateRequestButton() {
 			const data = await resp.json();
 			const requestId = data.request.id;
 			window.location.href = `/requests/edit/?id=${requestId}`;
+		} else {
+			setError("Failed to create request");
 		}
 	};
 

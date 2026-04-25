@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { ItemData } from "@/lib/server/DatabaseModels/item";
 
-export default function ItemCard({ item, requestId }: { item: ItemData; requestId: string }) {
+export default function ItemCard({ item }: { item: ItemData }) {
 	return (
 		<li className=" flex items-center justify-between w-full bg-base-200 p-4 rounded-md mb-2 ">
 			<div className="flex items-center w-full">

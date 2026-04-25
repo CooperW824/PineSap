@@ -4,7 +4,6 @@ import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { PersistedRequest } from "@/lib/server/DatabaseModels/request";
 import { PersistedItem } from "@/lib/server/DatabaseModels/item";
 import { headers } from "next/headers";
-import { it } from "node:test";
 
 /**
  * GET /api/items?id=itemId

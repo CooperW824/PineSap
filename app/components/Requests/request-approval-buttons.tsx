@@ -1,6 +1,5 @@
 "use client";
 
-import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function RequestApprovalButtons({ requestId }: { requestId: string }) {
@@ -23,6 +22,7 @@ export default function RequestApprovalButtons({ requestId }: { requestId: strin
 
 	return (
 		<div className="flex space-x-4 mb-6">
+			{error && <p className="text-error">{error}</p>}
 			<button onClick={() => handleApproval(true)} className="btn btn-success">
 				Approve
 			</button>

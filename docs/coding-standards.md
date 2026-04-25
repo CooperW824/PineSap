@@ -60,18 +60,18 @@ We use **Prettier** and **ESLint**. If your editor isn't running these on save, 
 ```typescript
 // ❌ Avoid
 function canEdit(requestOwner: User): boolean {
-  if (hasAccess(this.user, "member")) {
-    if (requestOwner.getId() === this.user.getId()) {
-      return true;
-    }
-  }
-  return false;
+	if (hasAccess(this.user, "member")) {
+		if (requestOwner.getId() === this.user.getId()) {
+			return true;
+		}
+	}
+	return false;
 }
 
 // ✅ Prefer
 function canEdit(requestOwner: User): boolean {
-  if (!hasAccess(this.user, "member")) return false;
-  return requestOwner.getId() === this.user.getId();
+	if (!hasAccess(this.user, "member")) return false;
+	return requestOwner.getId() === this.user.getId();
 }
 ```
 
@@ -96,9 +96,7 @@ function canEdit(requestOwner: User): boolean {
 
 ```typescript
 // ✅ Prefer this pattern for server actions
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
 ```
 
 - Use specific error messages. "Something went wrong" is not useful. "User not found with id: {id}" is.
