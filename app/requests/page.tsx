@@ -1,6 +1,3 @@
-// import { ChevronDown, Plus, RotateCcw, Trash2, UserRound } from "lucide-react";
-import Link from "next/link";
-// sample requests, delete later
 import { auth } from "@/lib/server/auth";
 import { headers } from "next/headers";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";

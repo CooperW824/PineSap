@@ -30,7 +30,6 @@ export default function RequestsList({
 			});
 	};
 
-
 	return (
 		<div className="space-y-3 w-1/2">
 			{paginatedRequests.map((request) => (

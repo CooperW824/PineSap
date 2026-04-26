@@ -12,7 +12,7 @@ import { headers } from "next/headers";
  * @param request The HTTP Request
  * @returns {request: {id: string, name: string, purpose: string | null, status: RequestStatus}} The details of the newly created request if successful, or an error message if not
  */
-export async function POST(_: Request) {
+export async function POST() {
 	const session = await auth.api.getSession({ headers: await headers() });
 
 	if (!session) {
@@ -31,7 +31,7 @@ export async function POST(_: Request) {
 	}
 
 	// This creates an empty request with just the user as the owner, we can update it later with the rest of the details. This is done to simplify the authorization logic, since we need to have a request object to check if the user can submit it or not.
-	const newRequest = await PersistedRequest.create(user?.id!);
+	const newRequest = await PersistedRequest.create(user!.id!);
 
 	return new Response(
 		JSON.stringify({
@@ -46,11 +46,11 @@ export async function POST(_: Request) {
 	);
 }
 
-/** 
+/**
  * PATCH /api/request?id=requestId
- * 
+ *
  * Updates the details of a request. Requires the user to have permission to edit requests.
- * 
+ *
  * Query Parameters:
  * - id: the ID of the request to update
  *
@@ -59,7 +59,7 @@ export async function POST(_: Request) {
  * - purpose: (optional) the new purpose of the request
  * - projectId: (optional) the ID of the project to associate with the request, or null to remove from project
  * - status: (optional) if set to "PENDING", will submit the request for approval
- * 
+ *
  * @returns {request: RequestData} The updated request details if successful, or an error message if not
  */
 

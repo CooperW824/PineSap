@@ -5,64 +5,61 @@ import { Authorizer } from "@/lib/server/authorization/authorization";
 /**
  * PATCH /api/user-management/role
  * Changes a user's role. Requires the caller to have permission to change roles.
- * 
- * Request Body:    
+ *
+ * Request Body:
  * - userId: the ID of the user to change the role of
  * - role: the new role to assign to the user
  * @param request The HTTP Request
  * @returns {user: {id: string, email: string, name: string, role: Role}} The updated user details if successful, or an error message if not
  */
 export async function PATCH(request: Request) {
-    const callerSession = await auth.api.getSession({ headers: request.headers });
+	const callerSession = await auth.api.getSession({ headers: request.headers });
 
-    if (!callerSession) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-        });
-    }
+	if (!callerSession) {
+		return new Response(JSON.stringify({ error: "Unauthorized" }), {
+			status: 401,
+		});
+	}
 
-    const callerUser = await PersistedUser.getById(callerSession.user.id);
+	const callerUser = await PersistedUser.getById(callerSession.user.id);
 
-    const authorizer = new Authorizer(callerUser!); // Since we have a valid session, we can be sure that the user exists in the database.
+	const authorizer = new Authorizer(callerUser!); // Since we have a valid session, we can be sure that the user exists in the database.
 
-    if (!authorizer.users().canChangeRole()) {
-        return new Response(JSON.stringify({ error: "Forbidden" }), {
-            status: 403,
-        });
-    }
+	if (!authorizer.users().canChangeRole()) {
+		return new Response(JSON.stringify({ error: "Forbidden" }), {
+			status: 403,
+		});
+	}
 
-    const { userId, role } = await request.json();
+	const { userId, role } = await request.json();
 
-    if (!userId || !role) {
-        return new Response(
-            JSON.stringify({ error: "User ID and role are required" }),
-            { status: 400 },
-        );
-    }
+	if (!userId || !role) {
+		return new Response(JSON.stringify({ error: "User ID and role are required" }), {
+			status: 400,
+		});
+	}
 
-    const user = await PersistedUser.getById(userId);
-    
-    if (!user) {
-        return new Response(JSON.stringify({ error: "User not found" }), {
-            status: 404,
-        });
-    }
+	const user = await PersistedUser.getById(userId);
 
-    user.role = role;
+	if (!user) {
+		return new Response(JSON.stringify({ error: "User not found" }), {
+			status: 404,
+		});
+	}
 
-    await user.save();
+	user.role = role;
 
-    return new Response(
-        JSON.stringify({
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            },
-        }),
-        { status: 200 },
-    );
+	await user.save();
+
+	return new Response(
+		JSON.stringify({
+			user: {
+				id: user.id,
+				email: user.email,
+				name: user.name,
+				role: user.role,
+			},
+		}),
+		{ status: 200 },
+	);
 }
-    
-    

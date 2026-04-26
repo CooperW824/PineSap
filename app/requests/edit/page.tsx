@@ -1,4 +1,3 @@
-import { Trash2, Pencil } from "lucide-react";
 import { PersistedUser } from "@/lib/server/DatabaseModels/user";
 import { auth } from "@/lib/server/auth";
 import { Authorizer } from "@/lib/server/authorization/authorization";
